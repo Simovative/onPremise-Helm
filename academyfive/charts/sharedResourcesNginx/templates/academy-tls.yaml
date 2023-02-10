@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  tls.crt: {{ .Values.ssl.tlsCertificateChain }}
+  tls.key: {{ .Values.ssl.tlsKey }}
+
+kind: Secret
+metadata:
+  name: academyfive.net-tls
+type: kubernetes.io/tls

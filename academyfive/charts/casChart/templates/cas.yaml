@@ -1,0 +1,93 @@
+---
+# configmap containing all env variables for cas image
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cas-configmap
+data:
+  #CAS_DEPLOYMENT_TYPE: "onpremise"
+  CAS_A5_API_SECRET_LOCATION: {{ .Values.envData.CAS_A5_API_SECRET_LOCATION }}
+  CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
+  ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
+  S3_ASSETS_URL: {{ .Values.envData.S3_ASSETS_URL | default .Values.global.domain }}
+  CAS_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL }}
+  SECRET_REGION: {{ .Values.envData.SECRET_REGION }}
+  REDIS_SESSION_ENDPOINT: {{ .Values.envData.REDIS_SESSION.ENDPOINT }}
+  REDIS_SESSION_IS_CLUSTER: {{ .Values.envData.REDIS_SESSION.IS_CLUSTER | quote }}
+  {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}
+  REDIS_SESSION_AUTH: {{ quote .Values.envData.REDIS_SESSION.AUTH }}
+  {{- end }}
+  REDIS_CACHE_ENDPOINT: {{ .Values.envData.REDIS_CACHE.ENDPOINT }}
+  REDIS_CACHE_IS_CLUSTER: {{ .Values.envData.REDIS_CACHE.IS_CLUSTER | quote }}
+  {{- if not (eq .Values.envData.REDIS_CACHE.AUTH "no_auth" ) }}
+  REDIS_CACHE_AUTH: {{ quote .Values.envData.REDIS_CACHE.AUTH }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cas-deployment
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: cas-app
+  template:
+    metadata:
+      labels:
+        app: cas-app
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "web"
+      containers:
+        - name: cas-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          ports:
+            - containerPort: 80
+              name: web
+          envFrom:
+            - configMapRef:
+                name: cas-configmap
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /mnt/shared-secret-volume
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.cpuLimits }}
+            requests:
+              cpu: {{ .Values.deployment.cpuRequests }}
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: cas-a5-api-shared-secret
+---
+# horizontal pod autoscaler for cas-deployment
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cas-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cas-deployment
+  minReplicas: {{ .Values.autoscaler.minReplicas }}
+  maxReplicas: {{ .Values.autoscaler.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.autoscaler.targetCPUUtilizationPercentage }}
+---
+# service for cas-deployment / app cas-app
+apiVersion: v1
+kind: Service
+metadata:
+  name: cas
+spec:
+  selector:
+    app: cas-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

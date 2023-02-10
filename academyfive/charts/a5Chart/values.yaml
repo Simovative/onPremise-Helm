@@ -1,0 +1,54 @@
+# Default values for a5Chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+envData:
+  CAS_A5_API_SECRET_LOCATION: "/mnt/shared-secret-volume/sharedSecret"
+  A5_BUCKET_NAME: "a5bucket"
+  CAS_BUCKET_NAME: "casbucket"
+  CAS_SERVICE_URL: "cas"
+  S3_REGION: "eu-central-1"
+  ASSET_SOURCE: "academy"
+  A5_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASSWORD>@minio.minio:9000"
+  A5_INFRASTRUCTURE_CONFIG: "/run/config"
+  REDIS_SESSION:
+    ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+    IS_CLUSTER: 1
+    AUTH: "no_auth"
+  REDIS_CACHE:
+    ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+    IS_CLUSTER: 1
+    AUTH: "no_auth"
+
+infrastructureData:
+  database_type: "mysql"
+  database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<databaseName>"
+  database_write_location: "mysql://<YOUR_WRITE_USER>:<PASSWORD>@<WRITER_END_POINT>/<DATABASE_NAME>"
+  filestorage_type: "s3"
+  session_type: "redis"
+  session_cluster: true
+  cache_type: "redis"
+  maintenance_mode: false
+  aws_region: "eu-central-1"
+
+deployment:
+  academyfiveReplicas: 1
+  image: <YOUR_IMAGE_LOCATION>
+  versionTag: feature-PLAT-5555-3
+  cpuLimits: 2000m
+  cpuRequests: 2000m
+  memoryLimits: 6G
+  memoryRequests: 4G
+  cron:
+    cpuLimits: 2048m
+    cpuRequests: 2048m
+    memoryLimits: 16G
+    memoryRequests: 16G
+
+autoscaler:
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 40
+
+service:
+  type: ClusterIP
+  port: 80

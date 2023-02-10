@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-cas
+  annotations:
+    # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
+    nginx.ingress.kubernetes.io/client-body-buffer-size: {{ .Values.ingress.clientBodyBufferSize }}
+    # proxy-body-size is client_max_body_size
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.ingress.proxyBodySize }}
+    nginx.ingress.kubernetes.io/keep-alive: "600"
+    nginx.ingress.kubernetes.io/max-worker-connections: "600"
+    nginx.ingress.kubernetes.io/client-body-timeout: "3000"
+    nginx.ingress.kubernetes.io/large-client-header-buffers: "2 1k"
+    nginx.ingress.kubernetes.io/client-header-buffer-size: "2k"
+    nginx.ingress.kubernetes.io/client-header-timeout: "3000"
+    # nginx.ingress.kubernetes.io/auth-keepalive-timeout: {{ quote .Values.ingress.authKeepaliveRequests }}
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ quote .Values.ingress.proxyConnectTimeout }}
+    nginx.ingress.kubernetes.io/proxy-read-timeout: {{ quote .Values.ingress.proxyReadTimeout }}
+    nginx.ingress.kubernetes.io/proxy-send-timeout: {{ quote .Values.ingress.proxySendTimeout }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header Ingress-Resource "ingress-cas";
+spec:
+  tls:
+    - hosts:
+      - {{ quote .Values.global.hosts }}
+      secretName: academyfive.net-tls
+  rules:
+  {{- range $casHosts := .Values.casHosts }}
+  - host: {{ $casHosts.name }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: cas
+            port:
+              number: 80
+  {{- end }}
+  ingressClassName: nginx

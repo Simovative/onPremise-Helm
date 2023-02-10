@@ -1,0 +1,33 @@
+# Default values for casChart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+envData:
+  CAS_A5_API_SECRET_LOCATION: "/mnt/shared-secret-volume/sharedSecret"
+  CAS_BUCKET_NAME: "casbucket"
+  ASSET_SOURCE: "academy"
+  CAS_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASSWORD>@minio.minio:9000"
+  SECRET_REGION: "eu-central-1"
+  REDIS_SESSION:
+    ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+    IS_CLUSTER: 1
+    AUTH: "no_auth"
+  REDIS_CACHE:
+    ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+    IS_CLUSTER: 1
+    AUTH: "no_auth"
+
+deployment:
+  replicas: 1
+  image: <YOUR_IMAGE_LOCATION>
+  versionTag: feature-ACFIVE-35480-5
+  cpuLimits: 500m
+  cpuRequests: 200m
+
+autoscaler:
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+
+service:
+  type: ClusterIP
+  port: 80

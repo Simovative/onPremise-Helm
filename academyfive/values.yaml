@@ -1,0 +1,77 @@
+# Default values for academyfive.
+# This is a YAML-formatted file.
+#
+
+global:
+  domain: "a5.university.com"
+  hosts: "*.university.com"
+
+a5Chart:
+  envData:
+    A5_BUCKET_NAME: "a5bucket"
+    CAS_BUCKET_NAME: "casbucket"
+    A5_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASS>@<YOUR_S3_HOST>:<PORT>"
+    REDIS_SESSION:
+      ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+      IS_CLUSTER: 1
+      AUTH: "no_auth"
+    REDIS_CACHE:
+      ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+      IS_CLUSTER: 1
+      AUTH: "no_auth"
+
+  infrastructureData:
+    database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<DATABASE_NAME>"
+    database_write_location: "mysql://<YOUR_WRITE_USER>:<PASSWORD>@<WRITER_END_POINT>/<DATABASE_NAME>"
+
+  deployment:
+    academyfiveReplicas: 1
+    image: <YOUR_IMAGE_LOCATION>
+    cpuLimits: 3000m
+    cpuRequests: 2000m
+    memoryLimits: 6G
+    memoryRequests: 4G
+    cron:
+      cpuLimits: 2048m
+      cpuRequests: 2048m
+      memoryLimits: 16G
+      memoryRequests: 16G
+
+  autoscaler:
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 40
+
+casChart:
+  envData:
+    CAS_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASS>@<YOUR_S3_HOST>:<PORT>"
+    REDIS_SESSION:
+      ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+      IS_CLUSTER: 1
+      AUTH: "no_auth"
+    REDIS_CACHE:
+      ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
+      IS_CLUSTER: 1
+      AUTH: "no_auth"
+
+  autoscaler:
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 50
+
+  deployment:
+    image: <YOUR_IMAGE_LOCATION>
+
+casIngress:
+  casHosts:
+  - name: application.university.com
+  - name: community.university.com
+  - name: pwa.university.com
+
+sharedResourcesNginx:
+  ssl:
+    tlsCertificateChain: <YOUR_CERT_CHAIN>
+    tlsKey: <YOUR_KEY>
+secretChart:
+  data:
+    sharedSecret: <YOUR_SECRET>

@@ -1,0 +1,205 @@
+# configmap containing all env variables for academy image
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: academy-configmap
+data:
+  #A5_DEPLOYMENT_TYPE: "onpremise"
+  CAS_A5_API_SECRET_LOCATION: {{ .Values.envData.CAS_A5_API_SECRET_LOCATION }}
+  CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
+  CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
+  S3_REGION: {{ .Values.envData.S3_REGION }}
+  ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
+  S3_ASSETS_URL: {{ .Values.global.domain }}
+  S3_ACADEMY_ASSETS_DOMAIN: {{ .Values.global.domain }}
+  AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
+  AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
+  {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}
+  REDIS_SESSION_AUTH: {{ quote .Values.envData.REDIS_SESSION.AUTH }}
+  {{- end }}
+
+  # backwards compatibility with pre 16.06.x
+  AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
+
+---
+# configmap containing mounted config directory academy image
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: academy-infrastructure-config-dir
+data:
+  {{ .Values.global.domain }}: |
+    {
+    "Url": {{ quote .Values.global.domain }},
+    "tenant_id": {{ quote .Values.global.domain }},
+    "database_type": {{ quote .Values.infrastructureData.database_type }},
+    "database_location": {{ quote .Values.infrastructureData.database_write_location }},
+    "database_read_location": {{ quote .Values.infrastructureData.database_read_location }},
+    "database_write_location": {{ quote .Values.infrastructureData.database_write_location }},
+    "filestorage_type": {{ quote .Values.infrastructureData.filestorage_type }},
+    "filestorage_location": "s3://{{.Values.envData.A5_BUCKET_NAME}}",
+    "filestorage_endpoint_url": {{ quote .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }},
+    "session_type": {{ quote .Values.infrastructureData.session_type }},
+    "session_location": {{ quote .Values.envData.REDIS_SESSION.ENDPOINT }},
+    "session_cluster": {{ .Values.envData.REDIS_SESSION.IS_CLUSTER | quote }},
+    "cache_type": {{ quote .Values.infrastructureData.cache_type}},
+    "cache_location": {
+      "clusterType": {{ .Values.envData.REDIS_CACHE.IS_CLUSTER | quote }},
+      "url":  {{ quote .Values.envData.REDIS_CACHE.ENDPOINT }}
+      {{- if not (eq .Values.envData.REDIS_CACHE.AUTH "no_auth" ) }}
+        ,"auth": {{ quote .Values.envData.REDIS_CACHE.AUTH }}
+      {{- end }}
+    },
+    "maintenance_mode": {{ .Values.infrastructureData.maintenance_mode }},
+    "aws_region": {{ quote .Values.infrastructureData.aws_region}}
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academy-deployment
+spec:
+  replicas: {{ .Values.deployment.academyfiveReplicas }}
+  selector:
+    matchLabels:
+      app: academy-app
+  template:
+    metadata:
+      labels:
+        app: academy-app
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "web"
+      containers:
+        - name: academy-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag}}
+          ports:
+            - containerPort: 80
+              name: web
+          envFrom:
+            - configMapRef:
+                name: academy-configmap
+          volumeMounts:
+            - name: infrastructure-config-dir-volume
+              mountPath: /run/config
+            - name: secret-volume
+              mountPath: /mnt/shared-secret-volume
+          resources:
+            limits:
+              memory: {{ .Values.deployment.memoryLimits }}
+              cpu: {{ .Values.deployment.cpuLimits }}
+            requests:
+              memory: {{ .Values.deployment.memoryRequests }}
+              cpu: {{ .Values.deployment.cpuRequests }}
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - name: academy-migration-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          imagePullPolicy: Always
+          command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php update:update' ]
+          envFrom:
+            - configMapRef:
+                name: academy-configmap
+          volumeMounts:
+            - name: infrastructure-config-dir-volume
+              mountPath: /run/config
+            - name: secret-volume
+              mountPath: /mnt/shared-secret-volume
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.cpuLimits }}
+            requests:
+              cpu: {{ .Values.deployment.cpuRequests }}
+      volumes:
+        - name: infrastructure-config-dir-volume
+          configMap:
+            name: academy-infrastructure-config-dir
+        - name: secret-volume
+          secret:
+            secretName: cas-a5-api-shared-secret
+---
+# horizontal pod autoscaler for academy-deployment
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: academy-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: academy-deployment
+  minReplicas: {{ .Values.autoscaler.minReplicas }}
+  maxReplicas: {{ .Values.autoscaler.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.autoscaler.targetCPUUtilizationPercentage }}
+---
+# service for academy-deployment / app academy-app
+apiVersion: v1
+kind: Service
+metadata:
+  name: academy
+spec:
+  selector:
+    app: academy-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+# configmap containing all env variables for academy image
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: academy-cron-configmap
+data:
+  #AC5_DEPLOYMENT_TYPE: "onpremise"
+  CAS_A5_API_SECRET_LOCATION: {{ .Values.envData.CAS_A5_API_SECRET_LOCATION }}
+  CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
+  CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
+  S3_REGION: {{ .Values.envData.S3_REGION }}
+  IS_CRON_SERVICE: "1"
+  AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
+  AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
+  # backwards compatibility with pre 16.06.x
+  AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academy-cron-deployment
+spec:
+  replicas: {{ .Values.deployment.academyfiveReplicas }}
+  selector:
+    matchLabels:
+      app: academy-app
+  template:
+    metadata:
+      labels:
+        app: academy-app
+    spec:
+      containers:
+        - name: academy-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag}}
+          envFrom:
+            - configMapRef:
+                name: academy-cron-configmap
+          volumeMounts:
+            - name: infrastructure-config-dir-volume
+              mountPath: /run/config
+          resources:
+            limits:
+              memory: {{ .Values.deployment.cron.memoryLimits }}
+              cpu: {{ .Values.deployment.cron.cpuLimits }}
+            requests:
+              memory: {{ .Values.deployment.cron.memoryRequests }}
+              cpu: {{ .Values.deployment.cron.cpuRequests }}
+      imagePullSecrets:
+        - name: image-secret
+      volumes:
+        - name: infrastructure-config-dir-volume
+          configMap:
+            name: academy-infrastructure-config-dir
