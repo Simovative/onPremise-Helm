@@ -33,7 +33,7 @@ infrastructureData:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: feature-PLAT-5555-3
+  versionTag: V16.06.12
   cpuLimits: 2000m
   cpuRequests: 2000m
   memoryLimits: 6G
@@ -43,6 +43,13 @@ deployment:
     cpuRequests: 2048m
     memoryLimits: 16G
     memoryRequests: 16G
+
+storage:
+  ## Will resolve to storageClassName: <storageClass>
+  ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:
+  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+  storageClass: "-"
+  size: 2Gi
 
 autoscaler:
   minReplicas: 2

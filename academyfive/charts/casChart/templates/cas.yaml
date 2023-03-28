@@ -36,6 +36,7 @@ spec:
     metadata:
       labels:
         app: cas-app
+        image-version: {{ .Values.deployment.versionTag }}
     spec:
       hostAliases:
         - ip: "127.0.0.1"
@@ -53,17 +54,28 @@ spec:
           volumeMounts:
             - name: secret-volume
               mountPath: /mnt/shared-secret-volume
+            - name: cas-logs-volume
+              mountPath: /var/log/php
           resources:
             limits:
               cpu: {{ .Values.deployment.cpuLimits }}
             requests:
               cpu: {{ .Values.deployment.cpuRequests }}
+        - name: cas-php-fpm-logs
+          image: busybox
+          command: [ "sh","-c","tail -F /var/log/php/php8.1-fpm.log" ]
+          volumeMounts:
+            - name: cas-logs-volume
+              mountPath: /var/log/php
       imagePullSecrets:
         - name: regcred
       volumes:
         - name: secret-volume
           secret:
             secretName: cas-a5-api-shared-secret
+        - name: cas-logs-volume
+          persistentVolumeClaim:
+            claimName: cas-logs-pvc-claim
 ---
 # horizontal pod autoscaler for cas-deployment
 apiVersion: autoscaling/v1
@@ -91,3 +103,21 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # This name uniquely identifies the PVC. This is used in deployment.
+  name: cas-logs-pvc-claim
+spec:
+  {{- if not (eq "-" .Values.storage.storageClass) }}
+  storageClassName: "{{ .Values.storage.storageClass }}"
+  {{- end }}
+  accessModes:
+    # The volume is mounted as read-write by Multiple nodes
+    - ReadWriteMany
+  resources:
+    # This is the request for storage. Should be available in the cluster.
+    requests:
+      storage: {{ .Values.storage.size }}

@@ -37,6 +37,13 @@ a5Chart:
       memoryLimits: 16G
       memoryRequests: 16G
 
+  storage:
+    ## Will resolve to storageClassName: <storageClass>
+    ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:
+    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+    storageClass: "-"
+    size: 2Gi
+
   autoscaler:
     minReplicas: 2
     maxReplicas: 10
@@ -54,6 +61,12 @@ casChart:
       IS_CLUSTER: 1
       AUTH: "no_auth"
 
+  storage:
+    ## Will resolve to storageClassName: <storageClass>
+    ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:
+    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+    storageClass: "-"
+    size: 2Gi
   autoscaler:
     minReplicas: 2
     maxReplicas: 10

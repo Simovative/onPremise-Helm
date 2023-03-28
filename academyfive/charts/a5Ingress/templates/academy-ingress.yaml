@@ -35,6 +35,18 @@ spec:
                 name: academy
                 port:
                   number: 80
+{{- if .Values.global.olddomain }}
+    - host: {{ .Values.global.olddomain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+{{- end}}
   ingressClassName: nginx
 
 ---
@@ -106,4 +118,26 @@ spec:
                 name: academy
                 port:
                   number: 80
+{{- if .Values.global.olddomain }}
+    - host: {{ .Values.global.olddomain }}
+      http:
+        paths:
+          # ingress-nginx uses re2-regex-syntax
+          # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
+          # https://github.com/google/re2/wiki/Syntax
+          - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+          - path: /cms/data/community/.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+{{- end}}
   ingressClassName: nginx

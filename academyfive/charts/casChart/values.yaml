@@ -19,9 +19,16 @@ envData:
 deployment:
   replicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: feature-ACFIVE-35480-5
+  versionTag: release-B395
   cpuLimits: 500m
   cpuRequests: 200m
+
+storage:
+  ## Will resolve to storageClassName: <storageClass>
+  ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:
+  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+  storageClass: "-"
+  size: 2Gi
 
 autoscaler:
   minReplicas: 2
