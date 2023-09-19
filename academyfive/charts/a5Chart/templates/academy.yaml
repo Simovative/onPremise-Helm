@@ -131,7 +131,7 @@ spec:
               mountPath: /srv/a5_source/files/log
         - name: academyfive-error-logs
           image: busybox
-          command: [ "sh","-c","tail -F /srv/a5_source/files/log/error.log" ]
+          command: [ "sh","-c","tail -F /srv/a5_source/files/log/error-json.log" ]
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
@@ -250,7 +250,7 @@ spec:
               memory: {{ .Values.deployment.cron.memoryRequests }}
               cpu: {{ .Values.deployment.cron.cpuRequests }}
       imagePullSecrets:
-        - name: image-secret
+        - name: regcred
       volumes:
         - name: infrastructure-config-dir-volume
           configMap:
