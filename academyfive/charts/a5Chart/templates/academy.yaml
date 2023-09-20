@@ -143,24 +143,6 @@ spec:
               mountPath: /srv/a5_source/files/log
       imagePullSecrets:
         - name: regcred
-      initContainers:
-        - name: academy-migration-container
-          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
-          imagePullPolicy: Always
-          command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php update:update' ]
-          envFrom:
-            - configMapRef:
-                name: academy-configmap
-          volumeMounts:
-            - name: infrastructure-config-dir-volume
-              mountPath: /run/config
-            - name: secret-volume
-              mountPath: /mnt/shared-secret-volume
-          resources:
-            limits:
-              cpu: {{ .Values.deployment.cpuLimits }}
-            requests:
-              cpu: {{ .Values.deployment.cpuRequests }}
       volumes:
         - name: infrastructure-config-dir-volume
           configMap:
@@ -251,6 +233,22 @@ spec:
               cpu: {{ .Values.deployment.cron.cpuRequests }}
       imagePullSecrets:
         - name: regcred
+      initContainers:
+        - name: academy-migration-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          imagePullPolicy: Always
+          command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php update:update' ]
+          envFrom:
+            - configMapRef:
+                name: academy-configmap
+          volumeMounts:
+            - name: infrastructure-config-dir-volume
+              mountPath: /run/config
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.cpuLimits }}
+            requests:
+              cpu: {{ .Values.deployment.cpuRequests }}
       volumes:
         - name: infrastructure-config-dir-volume
           configMap:
