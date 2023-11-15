@@ -17,6 +17,8 @@ data:
   {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}
   REDIS_SESSION_AUTH: {{ quote .Values.envData.REDIS_SESSION.AUTH }}
   {{- end }}
+  CA_CERT_FILE: {{ .Values.global.ca_cert_file }}
+  CA_CERT_VALUE: {{ .Values.global.ca_cert_value }}
 
   # backwards compatibility with pre 16.06.x
   AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
