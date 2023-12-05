@@ -22,8 +22,10 @@ data:
   {{- if not (eq .Values.envData.REDIS_CACHE.AUTH "no_auth" ) }}
   REDIS_CACHE_AUTH: {{ quote .Values.envData.REDIS_CACHE.AUTH }}
   {{- end }}
+  {{- if not (eq .Values.global.ca_cert_file "") }}
   CA_CERT_FILE: {{ .Values.global.ca_cert_file }}
   CA_CERT_VALUE: {{ .Values.global.ca_cert_value }}
+  {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
