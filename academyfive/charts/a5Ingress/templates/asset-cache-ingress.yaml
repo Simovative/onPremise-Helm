@@ -1,0 +1,104 @@
+{{- if .Values.assets.enabled -}}
+# caches static files and assets in order to reduce load on a5-containers
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-academy-assets
+  {{- with .Values.assets.labels }}
+  labels:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  annotations:
+  {{- with .Values.assets.annotations }}
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+    # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/keep-alive: "5"
+
+    nginx.ingress.kubernetes.io/proxy-buffering: {{ quote .Values.assets.proxyBuffering }}
+    # proxy-body-size is client_max_body_size
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.assets.proxyBodySize }}
+    nginx.ingress.kubernetes.io/client-body-buffer-size: {{ .Values.assets.clientBodyBufferSize }}
+
+    nginx.ingress.kubernetes.io/client-body-timeout: "36000"
+    nginx.ingress.kubernetes.io/large-client-header-buffers: "2 1k"
+    nginx.ingress.kubernetes.io/client-header-buffer-size: "2k"
+    nginx.ingress.kubernetes.io/proxy-buffer-number: "16"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+
+    nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_502"
+
+    nginx.ingress.kubernetes.io/keep-alive-requests: "10000"
+
+    nginx.ingress.kubernetes.io/client-header-timeout: "36000"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ quote .Values.assets.proxyConnectTimeout }}
+    nginx.ingress.kubernetes.io/proxy-read-timeout: {{ quote .Values.assets.proxyReadTimeout }}
+    nginx.ingress.kubernetes.io/proxy-send-timeout: {{ quote .Values.assets.proxySendTimeout }}
+    nginx.ingress.kubernetes.io/enable-cors: {{ quote .Values.assets.enableCors }}
+    nginx.ingress.kubernetes.io/cors-allow-origin: {{ quote .Values.assets.corsAllowOrigin }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_cache nginxproxycache;
+      proxy_cache_valid 200 1d;
+      proxy_cache_use_stale error timeout updating http_404 http_500 http_502 http_503 http_504;
+      expires 30d;
+
+      add_header Cache-Control "public, no-transform";
+      add_header X-Cache-Status $upstream_cache_status;
+      add_header Ingress-Resource "ingress-academy-assets";
+      #proxy_cache_bypass $http_x_purge;
+      proxy_cache_key $scheme://$host$uri$is_args$query_string;
+spec:
+  {{- if .Values.assets.tlsSecretName }}
+  tls:
+    - hosts:
+        - {{ quote .Values.global.hosts }}
+      secretName: {{ .Values.assets.tlsSecretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          # ingress-nginx uses re2-regex-syntax
+          # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
+          # https://github.com/google/re2/wiki/Syntax
+          - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+          - path: /cms/data/community/.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+{{- if .Values.global.olddomain }}
+    - host: {{ .Values.global.olddomain }}
+      http:
+        paths:
+          # ingress-nginx uses re2-regex-syntax
+          # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
+          # https://github.com/google/re2/wiki/Syntax
+          - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+          - path: /cms/data/community/.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
+            pathType: Prefix
+            backend:
+              service:
+                name: academy
+                port:
+                  number: 80
+{{- end }}
+  ingressClassName: {{ .Values.assets.ingressClassName }}
+{{- end }}

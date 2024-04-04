@@ -3,6 +3,11 @@
 # Declare variables to be passed into your templates.
 
 ingress:
+  #If required provide your own labels and annotations
+  labels: {}
+  annotations: {}
+  ingressClassName: nginx
+  tlsSecretName: academyfive.net-tls
   proxyBuffering: "off"
   authKeepaliveRequests: "10000"
   clientBodyBufferSize: "100M"
@@ -12,6 +17,12 @@ ingress:
   proxySendTimeout: "36000"
 
 assets:
+  enabled: true
+  #If required provide your own labels and annotations
+  labels: {}
+  annotations: {}
+  ingressClassName: nginx
+  tlsSecretName: academyfive.net-tls
   proxyBuffering: "on"
   clientBodyBufferSize: "100M"
   proxyBodySize: "100M"

@@ -16,30 +16,35 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 17.3.5
+version: 17.3.6
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "V17.03.5"
+appVersion: "V17.03.6"
 
 dependencies:
   - name: a5Chart
+    condition: a5Chart.enabled
     version: 1.0.2
     repository: "file://./charts/a5Chart"
   - name: casChart
+    condition: casChart.enabled
     version: 1.0.0
     repository: "file://./charts/casChart"
   - name: a5Ingress
+    condition: a5Ingress.enabled
     version: 1.0.0
     repository: "file://./charts/a5Ingress"
   - name: secretChart
     version: 1.0.0
     repository: "file://./charts/secretChart"
   - name: casIngress
+    condition: casIngress.enabled
     version: 1.0.0
     repository: "file://./charts/casIngress"
   - name: sharedResourcesNginx
+    condition: sharedResourcesNginx.enabled
     version: 1.0.0
     repository: "file://./charts/sharedResourcesNginx"

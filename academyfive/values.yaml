@@ -7,6 +7,7 @@ global:
   hosts: "*.university.com"
 
 a5Chart:
+  enabled: true
   envData:
     A5_BUCKET_NAME: "a5bucket"
     CAS_BUCKET_NAME: "casbucket"
@@ -50,6 +51,7 @@ a5Chart:
     targetCPUUtilizationPercentage: 40
 
 casChart:
+  enabled: true
   envData:
     CAS_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASS>@<YOUR_S3_HOST>:<PORT>"
     REDIS_SESSION:
@@ -75,16 +77,22 @@ casChart:
   deployment:
     image: <YOUR_IMAGE_LOCATION>
 
+a5Ingress:
+  enabled: true
+
 casIngress:
+  enabled: true
   casHosts:
   - name: application.university.com
   - name: community.university.com
   - name: pwa.university.com
 
 sharedResourcesNginx:
+  enabled: true
   ssl:
     tlsCertificateChain: <YOUR_CERT_CHAIN>
     tlsKey: <YOUR_KEY>
 secretChart:
+  enabled: true
   data:
     sharedSecret: <YOUR_SECRET>

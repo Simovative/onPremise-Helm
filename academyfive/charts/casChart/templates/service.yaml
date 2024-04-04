@@ -1,0 +1,12 @@
+# service for cas-deployment / app cas-app
+apiVersion: v1
+kind: Service
+metadata:
+  name: cas
+spec:
+  selector:
+    app: cas-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

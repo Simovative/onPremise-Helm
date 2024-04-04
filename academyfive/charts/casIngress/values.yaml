@@ -8,7 +8,12 @@ casHosts:
   - name: example-community.academyfive.net
 
 ingress:
-  proxyBuffering: "off"
+  #If required provide your own labels and annotations
+  labels: {}
+  annotations: {}
+  tlsSecretName: academyfive.net-tls
+  ingressClassName: nginx
+  proxyBuffering: "on"
   authKeepaliveRequests: "10000"
   clientBodyBufferSize: "100M"
   proxyBodySize: "500M"

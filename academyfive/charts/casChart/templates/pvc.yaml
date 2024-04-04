@@ -1,0 +1,17 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # This name uniquely identifies the PVC. This is used in deployment.
+  name: cas-logs-pvc-claim
+spec:
+  {{- if not (eq "-" .Values.storage.storageClass) }}
+  storageClassName: "{{ .Values.storage.storageClass }}"
+  {{- end }}
+  accessModes:
+    # The volume is mounted as read-write by Multiple nodes
+    - ReadWriteMany
+  resources:
+    # This is the request for storage. Should be available in the cluster.
+    requests:
+      storage: {{ .Values.storage.size }}

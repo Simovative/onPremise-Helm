@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cas-deployment
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: cas-app
+  template:
+    metadata:
+      labels:
+        app: cas-app
+        image-version: {{ .Values.deployment.versionTag }}
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "web"
+      containers:
+        - name: cas-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          ports:
+            - containerPort: 80
+              name: web
+          envFrom:
+            - configMapRef:
+                name: cas-configmap
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /mnt/shared-secret-volume
+            - name: cas-logs-volume
+              mountPath: /var/log/php
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.cpuLimits }}
+            requests:
+              cpu: {{ .Values.deployment.cpuRequests }}
+        - name: cas-php-fpm-logs
+          image: busybox
+          command: [ "sh","-c","tail -F /var/log/php/php8.1-fpm.log" ]
+          volumeMounts:
+            - name: cas-logs-volume
+              mountPath: /var/log/php
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: cas-a5-api-shared-secret
+        - name: cas-logs-volume
+          persistentVolumeClaim:
+            claimName: cas-logs-pvc-claim
