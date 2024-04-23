@@ -10,7 +10,9 @@ data:
   CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
   ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
   S3_ASSETS_URL: {{ .Values.envData.S3_ASSETS_URL | default .Values.global.domain }}
+  {{- if not (eq .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL "")}}
   CAS_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL }}
+  {{- end }}
   SECRET_REGION: {{ .Values.envData.SECRET_REGION }}
   REDIS_SESSION_ENDPOINT: {{ .Values.envData.REDIS_SESSION.ENDPOINT }}
   REDIS_SESSION_IS_CLUSTER: {{ .Values.envData.REDIS_SESSION.IS_CLUSTER | quote }}

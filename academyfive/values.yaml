@@ -11,7 +11,7 @@ a5Chart:
   envData:
     A5_BUCKET_NAME: "a5bucket"
     CAS_BUCKET_NAME: "casbucket"
-    A5_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASS>@<YOUR_S3_HOST>:<PORT>"
+    A5_FILESTORAGE_ENDPOINT_URL: ""
     REDIS_SESSION:
       ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
       IS_CLUSTER: 1
@@ -53,7 +53,8 @@ a5Chart:
 casChart:
   enabled: true
   envData:
-    CAS_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASS>@<YOUR_S3_HOST>:<PORT>"
+    CAS_FILESTORAGE_ENDPOINT_URL: ""
+    CAS_BUCKET_NAME: "casbucket"
     REDIS_SESSION:
       ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
       IS_CLUSTER: 1

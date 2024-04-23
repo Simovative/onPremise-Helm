@@ -1,5 +1,5 @@
 # horizontal pod autoscaler for cas-deployment
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: cas-hpa
@@ -10,4 +10,35 @@ spec:
     name: cas-deployment
   minReplicas: {{ .Values.autoscaler.minReplicas }}
   maxReplicas: {{ .Values.autoscaler.maxReplicas }}
-  targetCPUUtilizationPercentage: {{ .Values.autoscaler.targetCPUUtilizationPercentage }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaler.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaler.targetMemoryUtilizationPercentage }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.autoscaler.scaleDown.scaleDownStabilizationWindowSeconds }}
+      policies:
+        - periodSeconds: {{ .Values.autoscaler.scaleDown.shortScaleDownPeriod }}
+          type: Pods
+          value: {{ .Values.autoscaler.scaleDown.shortScaleDownPodAmount }}
+        - periodSeconds: {{ .Values.autoscaler.scaleDown.longScaleDownPeriod }}
+          type: Pods
+          value: {{ .Values.autoscaler.scaleDown.longScaleDownPeriodPodAmount }}
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.autoscaler.scaleUp.scaleUpStabilizationWindowSeconds }}
+      policies:
+        - periodSeconds: {{ .Values.autoscaler.scaleUp.longScaleUpPeriod }}
+          type: Pods
+          value: {{ .Values.autoscaler.scaleUp.longScaleUpPeriodPodAmount }}
+        - periodSeconds: {{ .Values.autoscaler.scaleUp.shortScaleUpPeriod }}
+          type: Percent
+          value: {{ .Values.autoscaler.scaleUp.shortScaleUpPeriodPodPercent }}

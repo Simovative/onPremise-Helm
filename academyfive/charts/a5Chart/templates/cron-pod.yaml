@@ -31,6 +31,7 @@ spec:
         app: academy-cron-app
         image-version: {{ .Values.deployment.versionTag }}
     spec:
+      serviceAccountName: {{ .Values.deployment.serviceAccountName }}
       containers:
         - name: academy-container
           image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag}}

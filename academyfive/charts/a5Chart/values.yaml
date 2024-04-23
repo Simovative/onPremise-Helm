@@ -8,7 +8,7 @@ envData:
   CAS_SERVICE_URL: "cas"
   S3_REGION: "eu-central-1"
   ASSET_SOURCE: "academy"
-  A5_FILESTORAGE_ENDPOINT_URL: "http://<USER>:<PASSWORD>@minio.minio:9000"
+  A5_FILESTORAGE_ENDPOINT_URL: ""
   A5_INFRASTRUCTURE_CONFIG: "/run/config"
   REDIS_SESSION:
     ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
@@ -33,7 +33,7 @@ infrastructureData:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V17.03.8
+  versionTag: V17.03.9
   cpuLimits: 2000m
   cpuRequests: 2000m
   memoryLimits: 6G
@@ -55,6 +55,19 @@ autoscaler:
   minReplicas: 2
   maxReplicas: 10
   targetCPUUtilizationPercentage: 40
+  targetMemoryUtilizationPercentage: 60
+  scaleDown:
+    scaleDownStabilizationWindowSeconds: 120
+    shortScaleDownPeriod: 30
+    shortScaleDownPodAmount: 1
+    longScaleDownPeriod: 300
+    longScaleDownPeriodPodAmount: 3
+  scaleUp:
+    scaleUpStabilizationWindowSeconds: 0
+    shortScaleUpPeriod: 10
+    shortScaleUpPeriodPodPercent: 100
+    longScaleUpPeriod: 120
+    longScaleUpPeriodPodAmount: 5
 
 service:
   type: ClusterIP
