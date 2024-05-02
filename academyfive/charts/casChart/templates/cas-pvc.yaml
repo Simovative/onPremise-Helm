@@ -1,4 +1,4 @@
-
+{{- if .Values.logging.usePersistentVolume }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -15,3 +15,4 @@ spec:
     # This is the request for storage. Should be available in the cluster.
     requests:
       storage: {{ .Values.storage.size }}
+{{- end}}

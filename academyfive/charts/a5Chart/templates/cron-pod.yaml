@@ -1,21 +1,3 @@
-# configmap containing all env variables for academy image
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: academy-cron-configmap
-data:
-  #AC5_DEPLOYMENT_TYPE: "onpremise"
-  CAS_A5_API_SECRET_LOCATION: {{ .Values.envData.CAS_A5_API_SECRET_LOCATION }}
-  CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
-  CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
-  S3_REGION: {{ .Values.envData.S3_REGION }}
-  IS_CRON_SERVICE: "1"
-  AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
-  AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
-  # backwards compatibility with pre 16.06.x
-  AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,22 +32,6 @@ spec:
               cpu: {{ .Values.deployment.cron.cpuRequests }}
       imagePullSecrets:
         - name: regcred
-      initContainers:
-        - name: academy-migration-container
-          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
-          imagePullPolicy: Always
-          command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php migrate' ]
-          envFrom:
-            - configMapRef:
-                name: academy-configmap
-          volumeMounts:
-            - name: infrastructure-config-dir-volume
-              mountPath: /run/config
-          resources:
-            limits:
-              cpu: {{ .Values.deployment.cpuLimits }}
-            requests:
-              cpu: {{ .Values.deployment.cpuRequests }}
       volumes:
         - name: infrastructure-config-dir-volume
           configMap:

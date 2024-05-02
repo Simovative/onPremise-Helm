@@ -24,6 +24,12 @@ deployment:
   cpuLimits: 500m
   cpuRequests: 200m
 
+logging:
+  # For more information: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
+    usePersistentVolume: false
+    # EmptyDir-SizeLimit. Will be ignored if usePersistentVolume is true
+    logSizeLimit: 500Mi
+
 storage:
   ## Will resolve to storageClassName: <storageClass>
   ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:

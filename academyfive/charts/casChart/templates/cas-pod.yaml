@@ -24,6 +24,12 @@ spec:
           ports:
             - containerPort: 80
               name: web
+          livenessProbe:
+            httpGet:
+              path: /healthcheck.php
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
           envFrom:
             - configMapRef:
                 name: cas-configmap
@@ -50,5 +56,10 @@ spec:
           secret:
             secretName: cas-a5-api-shared-secret
         - name: cas-logs-volume
+        {{- if .Values.logging.usePersistentVolume }}
           persistentVolumeClaim:
             claimName: cas-logs-pvc-claim
+        {{- else }}
+          emptyDir:
+            sizeLimit: {{ .Values.logging.logSizeLimit }}
+        {{- end }}

@@ -1,0 +1,44 @@
+# starts database migration
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "academy-migration-job-{{ .Values.deployment.versionTag | lower }}"
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-migrate"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        image-version: {{ .Values.deployment.versionTag }}
+    spec:
+      serviceAccountName: {{ .Values.deployment.serviceAccountName }}
+      restartPolicy: Never
+      containers:
+        - name: academy-migration-container
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          imagePullPolicy: Always
+          command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php migrate' ]
+          envFrom:
+            - configMapRef:
+                name: academy-configmap
+          volumeMounts:
+            - name: infrastructure-config-dir-volume
+              mountPath: /run/config
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.cpuLimits }}
+            requests:
+              cpu: {{ .Values.deployment.cpuRequests }}
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: infrastructure-config-dir-volume
+          configMap:
+            name: academy-infrastructure-config-dir

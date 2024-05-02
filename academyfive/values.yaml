@@ -38,6 +38,14 @@ a5Chart:
       memoryLimits: 16G
       memoryRequests: 16G
 
+  logging:
+    # Will create an emptyDir volume for logs if set to false or a persistentVolumeClaim if set to true
+    # For more information: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
+    usePersistentVolume: false
+    # EmptyDir-SizeLimit. Will be ignored if usePersistentVolume is true
+    logSizeLimit: 500Mi
+
+  # can be omitted if logging.usePersistentVolume is false
   storage:
     ## Will resolve to storageClassName: <storageClass>
     ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:
@@ -63,6 +71,12 @@ casChart:
       ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
       IS_CLUSTER: 1
       AUTH: "no_auth"
+
+  logging:
+    # For more information: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
+    usePersistentVolume: false
+    # EmptyDir-SizeLimit. Will be ignored if usePersistentVolume is true
+    logSizeLimit: 500Mi
 
   storage:
     ## Will resolve to storageClassName: <storageClass>

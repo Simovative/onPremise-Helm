@@ -1,0 +1,28 @@
+# configmap containing all env variables for academy image
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: academy-configmap
+data:
+  #A5_DEPLOYMENT_TYPE: "onpremise"
+  CAS_A5_API_SECRET_LOCATION: {{ .Values.envData.CAS_A5_API_SECRET_LOCATION }}
+  CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
+  CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
+  S3_REGION: {{ .Values.envData.S3_REGION }}
+  ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
+  S3_ASSETS_URL: {{ .Values.global.domain }}
+  S3_ACADEMY_ASSETS_DOMAIN: {{ .Values.global.domain }}
+  {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "")}}
+  AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
+  {{- end }}
+  AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
+  {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}
+  REDIS_SESSION_AUTH: {{ quote .Values.envData.REDIS_SESSION.AUTH }}
+  {{- end }}
+  {{- if not (eq .Values.global.ca_cert_file "") }}
+  CA_CERT_FILE: {{ .Values.global.ca_cert_file }}
+  CA_CERT_VALUE: {{ .Values.global.ca_cert_value }}
+  {{- end }}
+
+  # backwards compatibility with pre 16.06.x
+  AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}

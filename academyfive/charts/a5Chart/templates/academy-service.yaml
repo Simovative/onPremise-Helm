@@ -1,0 +1,12 @@
+# service for academy-deployment / app academy-app
+apiVersion: v1
+kind: Service
+metadata:
+  name: academy
+spec:
+  selector:
+    app: academy-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

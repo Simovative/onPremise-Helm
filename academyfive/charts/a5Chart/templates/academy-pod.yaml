@@ -1,31 +1,3 @@
-# configmap containing all env variables for academy image
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: academy-configmap
-data:
-  #A5_DEPLOYMENT_TYPE: "onpremise"
-  CAS_A5_API_SECRET_LOCATION: {{ .Values.envData.CAS_A5_API_SECRET_LOCATION }}
-  CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
-  CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
-  S3_REGION: {{ .Values.envData.S3_REGION }}
-  ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
-  S3_ASSETS_URL: {{ .Values.global.domain }}
-  S3_ACADEMY_ASSETS_DOMAIN: {{ .Values.global.domain }}
-  {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "")}}
-  AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
-  {{- end }}
-  AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
-  {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}
-  REDIS_SESSION_AUTH: {{ quote .Values.envData.REDIS_SESSION.AUTH }}
-  {{- end }}
-  {{- if not (eq .Values.global.ca_cert_file "") }}
-  CA_CERT_FILE: {{ .Values.global.ca_cert_file }}
-  CA_CERT_VALUE: {{ .Values.global.ca_cert_value }}
-  {{- end }}
-
-  # backwards compatibility with pre 16.06.x
-  AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -53,6 +25,12 @@ spec:
           ports:
             - containerPort: 80
               name: web
+          livenessProbe:
+            httpGet:
+              path: /healthcheck.php
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
           envFrom:
             - configMapRef:
                 name: academy-configmap
@@ -98,37 +76,11 @@ spec:
           secret:
             secretName: cas-a5-api-shared-secret
         - name: academy-logs-volume
+        {{- if .Values.logging.usePersistentVolume }}
           persistentVolumeClaim:
             claimName: academy-logs-pvc-claim
-
----
-# service for academy-deployment / app academy-app
-apiVersion: v1
-kind: Service
-metadata:
-  name: academy
-spec:
-  selector:
-    app: academy-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  # This name uniquely identifies the PVC. This is used in deployment.
-  name: academy-logs-pvc-claim
-spec:
-  {{- if not (eq "-" .Values.storage.storageClass) }}
-  storageClassName: "{{ .Values.storage.storageClass }}"
-  {{- end }}
-  accessModes:
-    # The volume is mounted as read-write by Multiple nodes
-    - ReadWriteMany
-  resources:
-    # This is the request for storage. Should be available in the cluster.
-    requests:
-      storage: {{ .Values.storage.size }}
+        {{- else }}
+          emptyDir:
+            # eviction manager keeps monitoring the disk space the emptyDir-Volume and, will evict pods when the usage exceeds the limit.
+            sizeLimit: {{ .Values.logging.logSizeLimit }}
+        {{- end }}
