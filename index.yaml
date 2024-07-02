@@ -2,8 +2,43 @@ apiVersion: v1
 entries:
   academyfive:
   - apiVersion: v2
+    appVersion: V17.06.10-php82
+    created: "2024-07-02T08:16:03.214856837Z"
+    dependencies:
+    - condition: a5Chart.enabled
+      name: a5Chart
+      repository: file://./charts/a5Chart
+      version: 1.0.2
+    - condition: casChart.enabled
+      name: casChart
+      repository: file://./charts/casChart
+      version: 1.0.0
+    - condition: a5Ingress.enabled
+      name: a5Ingress
+      repository: file://./charts/a5Ingress
+      version: 1.0.0
+    - name: secretChart
+      repository: file://./charts/secretChart
+      version: 1.0.0
+    - condition: casIngress.enabled
+      name: casIngress
+      repository: file://./charts/casIngress
+      version: 1.0.0
+    - condition: sharedResourcesNginx.enabled
+      name: sharedResourcesNginx
+      repository: file://./charts/sharedResourcesNginx
+      version: 1.0.0
+    description: A Helm chart for Kubernetes
+    digest: 2b6523ae96a6b8b50715719eee24dd3f64f3362b30e15e58166e0c7cba92e8d5
+    icon: https://test-version.academyfive.net/favicon.ico
+    name: academyfive
+    type: application
+    urls:
+    - https://simovative.github.io/onPremise-Helm/academyfive-17.6.10.tgz
+    version: 17.6.10
+  - apiVersion: v2
     appVersion: V17.06.9-php82
-    created: "2024-06-28T14:59:17.836430263Z"
+    created: "2024-07-02T08:16:03.234779128Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -38,7 +73,7 @@ entries:
     version: 17.6.9
   - apiVersion: v2
     appVersion: V17.06.8-php82
-    created: "2024-06-28T14:59:17.833712733Z"
+    created: "2024-07-02T08:16:03.231760555Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -73,7 +108,7 @@ entries:
     version: 17.6.8
   - apiVersion: v2
     appVersion: V17.06.7-php82
-    created: "2024-06-28T14:59:17.831087553Z"
+    created: "2024-07-02T08:16:03.228683736Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -108,7 +143,7 @@ entries:
     version: 17.6.7
   - apiVersion: v2
     appVersion: V17.06.6-php82
-    created: "2024-06-28T14:59:17.828182644Z"
+    created: "2024-07-02T08:16:03.223913438Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -143,7 +178,7 @@ entries:
     version: 17.6.6
   - apiVersion: v2
     appVersion: V17.06.5-php82
-    created: "2024-06-28T14:59:17.825261956Z"
+    created: "2024-07-02T08:16:03.220915502Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -178,7 +213,7 @@ entries:
     version: 17.6.5
   - apiVersion: v2
     appVersion: V17.06.4-php82
-    created: "2024-06-28T14:59:17.821732288Z"
+    created: "2024-07-02T08:16:03.217925733Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -213,7 +248,7 @@ entries:
     version: 17.6.4
   - apiVersion: v2
     appVersion: V17.05.9-stable
-    created: "2024-06-28T14:59:17.818896482Z"
+    created: "2024-07-02T08:16:03.212033725Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -248,7 +283,7 @@ entries:
     version: 17.5.9
   - apiVersion: v2
     appVersion: V17.05.7-stable
-    created: "2024-06-28T14:59:17.816261269Z"
+    created: "2024-07-02T08:16:03.20901831Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -283,7 +318,7 @@ entries:
     version: 17.5.7
   - apiVersion: v2
     appVersion: V17.05.6-php82
-    created: "2024-06-28T14:59:17.813434686Z"
+    created: "2024-07-02T08:16:03.204535266Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -318,7 +353,7 @@ entries:
     version: 17.5.6
   - apiVersion: v2
     appVersion: V17.05.5-stable
-    created: "2024-06-28T14:59:17.810726001Z"
+    created: "2024-07-02T08:16:03.200444624Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -353,7 +388,7 @@ entries:
     version: 17.5.5
   - apiVersion: v2
     appVersion: V17.05.4-stable
-    created: "2024-06-28T14:59:17.80804545Z"
+    created: "2024-07-02T08:16:03.197373644Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -388,7 +423,7 @@ entries:
     version: 17.5.4
   - apiVersion: v2
     appVersion: V17.05.3-php82
-    created: "2024-06-28T14:59:17.805093706Z"
+    created: "2024-07-02T08:16:03.194369594Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -423,7 +458,7 @@ entries:
     version: 17.5.3
   - apiVersion: v2
     appVersion: V17.05.2-php82
-    created: "2024-06-28T14:59:17.799588436Z"
+    created: "2024-07-02T08:16:03.189453227Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -458,7 +493,7 @@ entries:
     version: 17.5.2
   - apiVersion: v2
     appVersion: V17.05.1-php82
-    created: "2024-06-28T14:59:17.796687872Z"
+    created: "2024-07-02T08:16:03.184145511Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -493,7 +528,7 @@ entries:
     version: 17.5.1
   - apiVersion: v2
     appVersion: V17.05-php82
-    created: "2024-06-28T14:59:17.79365726Z"
+    created: "2024-07-02T08:16:03.178869617Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -528,7 +563,7 @@ entries:
     version: 17.5.0
   - apiVersion: v2
     appVersion: V17.04.14-stable
-    created: "2024-06-28T14:59:17.773140846Z"
+    created: "2024-07-02T08:16:03.154149807Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -563,7 +598,7 @@ entries:
     version: 17.4.14
   - apiVersion: v2
     appVersion: V17.04.14-2-stable
-    created: "2024-06-28T14:59:17.770181076Z"
+    created: "2024-07-02T08:16:03.148985492Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -598,7 +633,7 @@ entries:
     version: 17.4.14-2
   - apiVersion: v2
     appVersion: V17.04.12-php82
-    created: "2024-06-28T14:59:17.76685139Z"
+    created: "2024-07-02T08:16:03.146073512Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -633,7 +668,7 @@ entries:
     version: 17.4.12
   - apiVersion: v2
     appVersion: V17.04.11-stable
-    created: "2024-06-28T14:59:17.763985667Z"
+    created: "2024-07-02T08:16:03.143136406Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -668,7 +703,7 @@ entries:
     version: 17.4.11
   - apiVersion: v2
     appVersion: V17.04.11-2-stable
-    created: "2024-06-28T14:59:17.759768749Z"
+    created: "2024-07-02T08:16:03.140250474Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -703,7 +738,7 @@ entries:
     version: 17.4.11-2
   - apiVersion: v2
     appVersion: V17.04.9-stable
-    created: "2024-06-28T14:59:17.790781899Z"
+    created: "2024-07-02T08:16:03.172104536Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -738,7 +773,7 @@ entries:
     version: 17.4.9
   - apiVersion: v2
     appVersion: V17.04.8-php82
-    created: "2024-06-28T14:59:17.787780457Z"
+    created: "2024-07-02T08:16:03.168639007Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -773,7 +808,7 @@ entries:
     version: 17.4.8
   - apiVersion: v2
     appVersion: V17.04.6-stable
-    created: "2024-06-28T14:59:17.784957504Z"
+    created: "2024-07-02T08:16:03.165707723Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -808,7 +843,7 @@ entries:
     version: 17.4.6
   - apiVersion: v2
     appVersion: V17.04.5-php82
-    created: "2024-06-28T14:59:17.782146327Z"
+    created: "2024-07-02T08:16:03.162821574Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -843,7 +878,7 @@ entries:
     version: 17.4.5
   - apiVersion: v2
     appVersion: V17.04.4-php82
-    created: "2024-06-28T14:59:17.778122076Z"
+    created: "2024-07-02T08:16:03.160012521Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -878,7 +913,7 @@ entries:
     version: 17.4.4
   - apiVersion: v2
     appVersion: V17.04.3-php82
-    created: "2024-06-28T14:59:17.775547731Z"
+    created: "2024-07-02T08:16:03.157167733Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -913,7 +948,7 @@ entries:
     version: 17.4.3
   - apiVersion: v2
     appVersion: V17.03.9-stable
-    created: "2024-06-28T14:59:17.756844137Z"
+    created: "2024-07-02T08:16:03.137292097Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -948,7 +983,7 @@ entries:
     version: 17.3.9
   - apiVersion: v2
     appVersion: V17.03.8-stable
-    created: "2024-06-28T14:59:17.75426985Z"
+    created: "2024-07-02T08:16:03.133168852Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -983,7 +1018,7 @@ entries:
     version: 17.3.8
   - apiVersion: v2
     appVersion: V17.03.6
-    created: "2024-06-28T14:59:17.75180814Z"
+    created: "2024-07-02T08:16:03.126803087Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -1018,7 +1053,7 @@ entries:
     version: 17.3.6
   - apiVersion: v2
     appVersion: V17.03.6-3-php82
-    created: "2024-06-28T14:59:17.749349723Z"
+    created: "2024-07-02T08:16:03.12175441Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -1053,7 +1088,7 @@ entries:
     version: 17.3.6-3
   - apiVersion: v2
     appVersion: V17.03.6-2-stable
-    created: "2024-06-28T14:59:17.746748038Z"
+    created: "2024-07-02T08:16:03.119253501Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -1088,7 +1123,7 @@ entries:
     version: 17.3.6-2
   - apiVersion: v2
     appVersion: V17.03.5
-    created: "2024-06-28T14:59:17.742859724Z"
+    created: "2024-07-02T08:16:03.116725652Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1118,7 +1153,7 @@ entries:
     version: 17.3.5
   - apiVersion: v2
     appVersion: V17.03.4-stable
-    created: "2024-06-28T14:59:17.74076055Z"
+    created: "2024-07-02T08:16:03.114421986Z"
     dependencies:
     - condition: a5Chart.enabled
       name: a5Chart
@@ -1153,7 +1188,7 @@ entries:
     version: 17.3.4
   - apiVersion: v2
     appVersion: V17.03.2
-    created: "2024-06-28T14:59:17.738278741Z"
+    created: "2024-07-02T08:16:03.110818991Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1183,7 +1218,7 @@ entries:
     version: 17.3.2
   - apiVersion: v2
     appVersion: V17.03.1
-    created: "2024-06-28T14:59:17.736159999Z"
+    created: "2024-07-02T08:16:03.106567765Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1213,7 +1248,7 @@ entries:
     version: 17.3.1
   - apiVersion: v2
     appVersion: V17.03
-    created: "2024-06-28T14:59:17.733948369Z"
+    created: "2024-07-02T08:16:03.100831021Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1243,7 +1278,7 @@ entries:
     version: 17.3.0
   - apiVersion: v2
     appVersion: V17.02.15-stable
-    created: "2024-06-28T14:59:17.72155447Z"
+    created: "2024-07-02T08:16:03.08851304Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1273,7 +1308,7 @@ entries:
     version: 17.2.15
   - apiVersion: v2
     appVersion: V17.02.13-stable
-    created: "2024-06-28T14:59:17.719413917Z"
+    created: "2024-07-02T08:16:03.086121206Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1303,7 +1338,7 @@ entries:
     version: 17.2.13
   - apiVersion: v2
     appVersion: V17.02.12-stable
-    created: "2024-06-28T14:59:17.717314863Z"
+    created: "2024-07-02T08:16:03.083512181Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1333,7 +1368,7 @@ entries:
     version: 17.2.12
   - apiVersion: v2
     appVersion: V17.02.11
-    created: "2024-06-28T14:59:17.715113987Z"
+    created: "2024-07-02T08:16:03.077542539Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1363,7 +1398,7 @@ entries:
     version: 17.2.11
   - apiVersion: v2
     appVersion: V17.02.8
-    created: "2024-06-28T14:59:17.731771501Z"
+    created: "2024-07-02T08:16:03.098351342Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1393,7 +1428,7 @@ entries:
     version: 17.2.8
   - apiVersion: v2
     appVersion: V17.02.6-stable
-    created: "2024-06-28T14:59:17.729565133Z"
+    created: "2024-07-02T08:16:03.095701644Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1423,7 +1458,7 @@ entries:
     version: 17.2.6
   - apiVersion: v2
     appVersion: V17.02.4
-    created: "2024-06-28T14:59:17.725779278Z"
+    created: "2024-07-02T08:16:03.093172439Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1453,7 +1488,7 @@ entries:
     version: 17.2.4
   - apiVersion: v2
     appVersion: V17.02.3
-    created: "2024-06-28T14:59:17.723719983Z"
+    created: "2024-07-02T08:16:03.090855081Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1483,7 +1518,7 @@ entries:
     version: 17.2.3
   - apiVersion: v2
     appVersion: V17.02.1
-    created: "2024-06-28T14:59:17.71291782Z"
+    created: "2024-07-02T08:16:03.075189372Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1513,7 +1548,7 @@ entries:
     version: 17.2.1
   - apiVersion: v2
     appVersion: V17.01.12-stable
-    created: "2024-06-28T14:59:17.699304481Z"
+    created: "2024-07-02T08:16:03.060632884Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1543,7 +1578,7 @@ entries:
     version: 17.1.12
   - apiVersion: v2
     appVersion: V17.01.8
-    created: "2024-06-28T14:59:17.710622463Z"
+    created: "2024-07-02T08:16:03.072804336Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1573,7 +1608,7 @@ entries:
     version: 17.1.8
   - apiVersion: v2
     appVersion: V17.01.7-stable
-    created: "2024-06-28T14:59:17.707391026Z"
+    created: "2024-07-02T08:16:03.07049437Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1603,7 +1638,7 @@ entries:
     version: 17.1.7
   - apiVersion: v2
     appVersion: V17.01.6-stable
-    created: "2024-06-28T14:59:17.705388021Z"
+    created: "2024-07-02T08:16:03.068109135Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1633,7 +1668,7 @@ entries:
     version: 17.1.6
   - apiVersion: v2
     appVersion: V17.01.3
-    created: "2024-06-28T14:59:17.703348698Z"
+    created: "2024-07-02T08:16:03.06571806Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1663,7 +1698,7 @@ entries:
     version: 17.1.3
   - apiVersion: v2
     appVersion: V17.01.2-stable
-    created: "2024-06-28T14:59:17.701331974Z"
+    created: "2024-07-02T08:16:03.063177501Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1693,7 +1728,7 @@ entries:
     version: 17.1.2
   - apiVersion: v2
     appVersion: V17.01.1
-    created: "2024-06-28T14:59:17.697105077Z"
+    created: "2024-07-02T08:16:03.056037306Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1723,7 +1758,7 @@ entries:
     version: 17.1.1
   - apiVersion: v2
     appVersion: V17.01
-    created: "2024-06-28T14:59:17.694762467Z"
+    created: "2024-07-02T08:16:03.053660741Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1753,7 +1788,7 @@ entries:
     version: 17.1.0
   - apiVersion: v2
     appVersion: V17.00.8
-    created: "2024-06-28T14:59:17.691083891Z"
+    created: "2024-07-02T08:16:03.051358976Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1783,7 +1818,7 @@ entries:
     version: 17.0.8
   - apiVersion: v2
     appVersion: V17.00.7
-    created: "2024-06-28T14:59:17.688913959Z"
+    created: "2024-07-02T08:16:03.04900702Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1813,7 +1848,7 @@ entries:
     version: 17.0.7
   - apiVersion: v2
     appVersion: V17.00.5
-    created: "2024-06-28T14:59:17.686777333Z"
+    created: "2024-07-02T08:16:03.046049707Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1843,7 +1878,7 @@ entries:
     version: 17.0.5
   - apiVersion: v2
     appVersion: V17.00.3
-    created: "2024-06-28T14:59:17.684686533Z"
+    created: "2024-07-02T08:16:03.043712571Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1873,7 +1908,7 @@ entries:
     version: 17.0.3
   - apiVersion: v2
     appVersion: V17.00.2
-    created: "2024-06-28T14:59:17.682023405Z"
+    created: "2024-07-02T08:16:03.041199601Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1903,7 +1938,7 @@ entries:
     version: 17.0.2
   - apiVersion: v2
     appVersion: V17.00.1
-    created: "2024-06-28T14:59:17.679862809Z"
+    created: "2024-07-02T08:16:03.036948109Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1933,7 +1968,7 @@ entries:
     version: 17.0.1
   - apiVersion: v2
     appVersion: V17.00.0
-    created: "2024-06-28T14:59:17.677655301Z"
+    created: "2024-07-02T08:16:03.034112925Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1963,7 +1998,7 @@ entries:
     version: 17.0.0
   - apiVersion: v2
     appVersion: V16.16.15
-    created: "2024-06-28T14:59:17.664886189Z"
+    created: "2024-07-02T08:16:03.021468766Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -1993,7 +2028,7 @@ entries:
     version: 16.16.15
   - apiVersion: v2
     appVersion: V16.16.13
-    created: "2024-06-28T14:59:17.662585366Z"
+    created: "2024-07-02T08:16:03.01562842Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2023,7 +2058,7 @@ entries:
     version: 16.16.13
   - apiVersion: v2
     appVersion: V16.16.12
-    created: "2024-06-28T14:59:17.660353386Z"
+    created: "2024-07-02T08:16:03.011459385Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2053,7 +2088,7 @@ entries:
     version: 16.16.12
   - apiVersion: v2
     appVersion: V16.16.11
-    created: "2024-06-28T14:59:17.65721301Z"
+    created: "2024-07-02T08:16:03.007433601Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2083,7 +2118,7 @@ entries:
     version: 16.16.11
   - apiVersion: v2
     appVersion: V16.16.10
-    created: "2024-06-28T14:59:17.65498808Z"
+    created: "2024-07-02T08:16:03.003347055Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2113,7 +2148,7 @@ entries:
     version: 16.16.10
   - apiVersion: v2
     appVersion: V16.16.9
-    created: "2024-06-28T14:59:17.673474527Z"
+    created: "2024-07-02T08:16:03.031765175Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2143,7 +2178,7 @@ entries:
     version: 16.16.9
   - apiVersion: v2
     appVersion: V16.16.6
-    created: "2024-06-28T14:59:17.671271838Z"
+    created: "2024-07-02T08:16:03.029472072Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2173,7 +2208,7 @@ entries:
     version: 16.16.6
   - apiVersion: v2
     appVersion: V16.16.5
-    created: "2024-06-28T14:59:17.669195854Z"
+    created: "2024-07-02T08:16:03.026906312Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2203,7 +2238,7 @@ entries:
     version: 16.16.5
   - apiVersion: v2
     appVersion: V16.16.4
-    created: "2024-06-28T14:59:17.666979313Z"
+    created: "2024-07-02T08:16:03.023819765Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2233,7 +2268,7 @@ entries:
     version: 16.16.4
   - apiVersion: v2
     appVersion: V16.15.19
-    created: "2024-06-28T14:59:17.640414908Z"
+    created: "2024-07-02T08:16:02.981301027Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2263,7 +2298,7 @@ entries:
     version: 16.15.19
   - apiVersion: v2
     appVersion: V16.15.18
-    created: "2024-06-28T14:59:17.638285759Z"
+    created: "2024-07-02T08:16:02.9791027Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2293,7 +2328,7 @@ entries:
     version: 16.15.18
   - apiVersion: v2
     appVersion: V16.15.17
-    created: "2024-06-28T14:59:17.635932397Z"
+    created: "2024-07-02T08:16:02.976940797Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2323,7 +2358,7 @@ entries:
     version: 16.15.17
   - apiVersion: v2
     appVersion: V16.15.16
-    created: "2024-06-28T14:59:17.633793427Z"
+    created: "2024-07-02T08:16:02.974643266Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2353,7 +2388,7 @@ entries:
     version: 16.15.16
   - apiVersion: v2
     appVersion: V16.15.15
-    created: "2024-06-28T14:59:17.631473343Z"
+    created: "2024-07-02T08:16:02.972238397Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2383,7 +2418,7 @@ entries:
     version: 16.15.15
   - apiVersion: v2
     appVersion: V16.15.14
-    created: "2024-06-28T14:59:17.629325687Z"
+    created: "2024-07-02T08:16:02.969821781Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2413,7 +2448,7 @@ entries:
     version: 16.15.14
   - apiVersion: v2
     appVersion: V16.15.13
-    created: "2024-06-28T14:59:17.627185544Z"
+    created: "2024-07-02T08:16:02.964520717Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2443,7 +2478,7 @@ entries:
     version: 16.15.13
   - apiVersion: v2
     appVersion: V16.15.12
-    created: "2024-06-28T14:59:17.624991604Z"
+    created: "2024-07-02T08:16:02.957049216Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2473,7 +2508,7 @@ entries:
     version: 16.15.12
   - apiVersion: v2
     appVersion: V16.15.11
-    created: "2024-06-28T14:59:17.621631024Z"
+    created: "2024-07-02T08:16:02.954820533Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2503,7 +2538,7 @@ entries:
     version: 16.15.11
   - apiVersion: v2
     appVersion: V16.15.10
-    created: "2024-06-28T14:59:17.619435528Z"
+    created: "2024-07-02T08:16:02.952644101Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2533,7 +2568,7 @@ entries:
     version: 16.15.10
   - apiVersion: v2
     appVersion: V16.15.9
-    created: "2024-06-28T14:59:17.652948141Z"
+    created: "2024-07-02T08:16:02.999314752Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2563,7 +2598,7 @@ entries:
     version: 16.15.9
   - apiVersion: v2
     appVersion: V16.15.8
-    created: "2024-06-28T14:59:17.650696631Z"
+    created: "2024-07-02T08:16:02.995188769Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2593,7 +2628,7 @@ entries:
     version: 16.15.8
   - apiVersion: v2
     appVersion: V16.15.7
-    created: "2024-06-28T14:59:17.648585123Z"
+    created: "2024-07-02T08:16:02.991182539Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2623,7 +2658,7 @@ entries:
     version: 16.15.7
   - apiVersion: v2
     appVersion: V16.15.5
-    created: "2024-06-28T14:59:17.646376744Z"
+    created: "2024-07-02T08:16:02.985741949Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2653,7 +2688,7 @@ entries:
     version: 16.15.5
   - apiVersion: v2
     appVersion: V16.15.4
-    created: "2024-06-28T14:59:17.644146299Z"
+    created: "2024-07-02T08:16:02.983488764Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2683,7 +2718,7 @@ entries:
     version: 16.15.4
   - apiVersion: v2
     appVersion: V16.15.1
-    created: "2024-06-28T14:59:17.617175974Z"
+    created: "2024-07-02T08:16:02.95026239Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2713,7 +2748,7 @@ entries:
     version: 16.15.1
   - apiVersion: v2
     appVersion: V16.14.14
-    created: "2024-06-28T14:59:17.610506015Z"
+    created: "2024-07-02T08:16:02.943138534Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2743,7 +2778,7 @@ entries:
     version: 16.14.14
   - apiVersion: v2
     appVersion: V16.14.13
-    created: "2024-06-28T14:59:17.608323262Z"
+    created: "2024-07-02T08:16:02.939693938Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2773,7 +2808,7 @@ entries:
     version: 16.14.13
   - apiVersion: v2
     appVersion: V16.14.10
-    created: "2024-06-28T14:59:17.604838107Z"
+    created: "2024-07-02T08:16:02.935825835Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2803,7 +2838,7 @@ entries:
     version: 16.14.10
   - apiVersion: v2
     appVersion: V16.14.5
-    created: "2024-06-28T14:59:17.614914915Z"
+    created: "2024-07-02T08:16:02.947932837Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2833,7 +2868,7 @@ entries:
     version: 16.14.5
   - apiVersion: v2
     appVersion: V16.14.4
-    created: "2024-06-28T14:59:17.612822935Z"
+    created: "2024-07-02T08:16:02.945501022Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2863,7 +2898,7 @@ entries:
     version: 16.14.4
   - apiVersion: v2
     appVersion: V16.13.14
-    created: "2024-06-28T14:59:17.602522034Z"
+    created: "2024-07-02T08:16:02.933654068Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2893,7 +2928,7 @@ entries:
     version: 16.13.14
   - apiVersion: v2
     appVersion: 16.15.22
-    created: "2024-06-28T14:59:17.838593334Z"
+    created: "2024-07-02T08:16:03.237242677Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2923,7 +2958,7 @@ entries:
     version: 6.15.22
   - apiVersion: v2
     appVersion: V16.13.7
-    created: "2024-06-28T14:59:17.600325113Z"
+    created: "2024-07-02T08:16:02.931398046Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2953,7 +2988,7 @@ entries:
     version: 1.3.0
   - apiVersion: v2
     appVersion: V16.12.3
-    created: "2024-06-28T14:59:17.597988233Z"
+    created: "2024-07-02T08:16:02.929081308Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -2983,7 +3018,7 @@ entries:
     version: 1.2.0
   - apiVersion: v2
     appVersion: V16.08.5
-    created: "2024-06-28T14:59:17.595824911Z"
+    created: "2024-07-02T08:16:02.926656253Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -3013,7 +3048,7 @@ entries:
     version: 1.1.1
   - apiVersion: v2
     appVersion: V16.06.12
-    created: "2024-06-28T14:59:17.593674084Z"
+    created: "2024-07-02T08:16:02.9243382Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -3043,7 +3078,7 @@ entries:
     version: 1.1.0
   - apiVersion: v2
     appVersion: V16.06
-    created: "2024-06-28T14:59:17.590791433Z"
+    created: "2024-07-02T08:16:02.921351446Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -3073,7 +3108,7 @@ entries:
     version: 1.0.0
   - apiVersion: v2
     appVersion: V16.06
-    created: "2024-06-28T14:59:17.587126256Z"
+    created: "2024-07-02T08:16:02.91554813Z"
     dependencies:
     - name: a5Chart
       repository: file://./charts/a5Chart
@@ -3101,4 +3136,4 @@ entries:
     urls:
     - https://simovative.github.io/onPremise-Helm/academyfive-0.9.0.tgz
     version: 0.9.0
-generated: "2024-06-28T14:59:17.584021168Z"
+generated: "2024-07-02T08:16:02.91027248Z"
