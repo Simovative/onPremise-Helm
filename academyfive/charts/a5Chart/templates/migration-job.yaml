@@ -24,10 +24,13 @@ spec:
         - name: academy-migration-container
           image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
           imagePullPolicy: Always
-          command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php migrate' ]
+          command: [ 'bash', '-c', 'sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php migrate' ]
           envFrom:
             - configMapRef:
                 name: academy-configmap
+          env:
+            - name: AC5_TENANT
+              value: {{ .Values.global.domain }}
           volumeMounts:
             - name: infrastructure-config-dir-volume
               mountPath: /run/config
