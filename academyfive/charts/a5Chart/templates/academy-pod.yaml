@@ -54,18 +54,39 @@ spec:
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
         - name: academyfive-error-logs
           image: busybox
           command: [ "sh","-c","tail -F /srv/a5_source/files/log/error-json.log" ]
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
         - name: academyfive-data-access-logs
           image: busybox
           command: [ "sh","-c","tail -F /srv/a5_source/files/log/data-access.log" ]
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
       imagePullSecrets:
         - name: regcred
       volumes:
