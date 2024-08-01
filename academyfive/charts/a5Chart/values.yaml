@@ -33,12 +33,27 @@ infrastructureData:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V17.07.4
+  versionTag: V17.07.5
   serviceAccountName: default
   cpuLimits: 2000m
   cpuRequests: 2000m
   memoryLimits: 6G
   memoryRequests: 4G
+  academyfiveAcademyLogs:
+    cpuLimits: 250m
+    cpuRequests: 10m
+    memoryLimits: 256Mi
+    memoryRequests: 100Mi
+  academyfiveErrorLogs:
+    cpuLimits: 250m
+    cpuRequests: 10m
+    memoryLimits: 256Mi
+    memoryRequests: 100Mi
+  academyfiveDataAccessLogs:
+    cpuLimits: 250m
+    cpuRequests: 10m
+    memoryLimits: 256Mi
+    memoryRequests: 100Mi
   cron:
     cpuLimits: 2048m
     cpuRequests: 2048m

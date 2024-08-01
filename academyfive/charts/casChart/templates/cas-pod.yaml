@@ -49,6 +49,13 @@ spec:
           volumeMounts:
             - name: cas-logs-volume
               mountPath: /var/log/php
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.casPhpFpmLogs.cpuLimits }}
+              memory: {{ .Values.deployment.casPhpFpmLogs.memoryLimits }}
+            requests:
+              cpu: {{ .Values.deployment.casPhpFpmLogs.cpuRequests }}
+              memory: {{ .Values.deployment.casPhpFpmLogs.memoryRequests }}
       imagePullSecrets:
         - name: regcred
       volumes:

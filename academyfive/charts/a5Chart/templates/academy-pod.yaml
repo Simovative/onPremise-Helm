@@ -54,18 +54,39 @@ spec:
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.academyfiveAcademyLogs.cpuLimits }}
+              memory: {{ .Values.deployment.academyfiveAcademyLogs.memoryLimits }}
+            requests:
+              cpu: {{ .Values.deployment.academyfiveAcademyLogs.cpuRequests }}
+              memory: {{ .Values.deployment.academyfiveAcademyLogs.cpuLimits }}
         - name: academyfive-error-logs
           image: busybox
           command: [ "sh","-c","tail -F /srv/a5_source/files/log/error-json.log" ]
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.academyfiveErrorLogs.cpuLimits }}
+              memory: {{ .Values.deployment.academyfiveErrorLogs.memoryLimits }}
+            requests:
+              cpu: {{ .Values.deployment.academyfiveErrorLogs.cpuRequests }}
+              memory: {{ .Values.deployment.academyfiveErrorLogs.memoryRequests }}
         - name: academyfive-data-access-logs
           image: busybox
           command: [ "sh","-c","tail -F /srv/a5_source/files/log/data-access.log" ]
           volumeMounts:
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+          resources:
+            limits:
+              cpu: {{ .Values.deployment.academyfiveDataAccessLogs.cpuLimits }}
+              memory: {{ .Values.deployment.academyfiveDataAccessLogs.memoryLimits }}
+            requests:
+              cpu: {{ .Values.deployment.academyfiveDataAccessLogs.cpuRequests }}
+              memory: {{ .Values.deployment.academyfiveDataAccessLogs.memoryRequests }}
       imagePullSecrets:
         - name: regcred
       volumes:

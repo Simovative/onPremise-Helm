@@ -37,6 +37,22 @@ a5Chart:
       cpuRequests: 2048m
       memoryLimits: 16G
       memoryRequests: 16G
+    #Deployment values for Logs can be left as default for most systems.
+    academyfiveAcademyLogs:
+      cpuLimits: 250m
+      cpuRequests: 10m
+      memoryLimits: 256Mi
+      memoryRequests: 100Mi
+    academyfiveErrorLogs:
+      cpuLimits: 250m
+      cpuRequests: 10m
+      memoryLimits: 256Mi
+      memoryRequests: 100Mi
+    academyfiveDataAccessLogs:
+      cpuLimits: 250m
+      cpuRequests: 10m
+      memoryLimits: 256Mi
+      memoryRequests: 100Mi
 
   logging:
     # Will create an emptyDir volume for logs if set to false or a persistentVolumeClaim if set to true
@@ -91,6 +107,12 @@ casChart:
 
   deployment:
     image: <YOUR_IMAGE_LOCATION>
+  #Deployment values for Logs can be left as default for most systems.
+  casPhpFpmLogs:
+    cpuLimits: 250m
+    cpuRequests: 10m
+    memoryLimits: 256Mi
+    memoryRequests: 100Mi
 
 a5Ingress:
   enabled: true
