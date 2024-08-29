@@ -60,7 +60,7 @@ spec:
               memory: {{ .Values.deployment.academyfiveAcademyLogs.memoryLimits }}
             requests:
               cpu: {{ .Values.deployment.academyfiveAcademyLogs.cpuRequests }}
-              memory: {{ .Values.deployment.academyfiveAcademyLogs.cpuLimits }}
+              memory: {{ .Values.deployment.academyfiveAcademyLogs.memoryLimits }}
         - name: academyfive-error-logs
           image: busybox
           command: [ "sh","-c","tail -F /srv/a5_source/files/log/error-json.log" ]
