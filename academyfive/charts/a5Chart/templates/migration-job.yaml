@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "academy-migration-job-{{ .Values.deployment.versionTag | lower }}"
+  name: "academy-migration-job-{{ .Values.deployment.versionTag | lower | replace "." "-"}}"
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:

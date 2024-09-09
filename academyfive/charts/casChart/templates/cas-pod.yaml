@@ -40,8 +40,10 @@ spec:
               mountPath: /var/log/php
           resources:
             limits:
+              memory: {{ .Values.deployment.memoryLimits }}
               cpu: {{ .Values.deployment.cpuLimits }}
             requests:
+              memory: {{ .Values.deployment.memoryRequests }}
               cpu: {{ .Values.deployment.cpuRequests }}
         - name: cas-php-fpm-logs
           image: busybox

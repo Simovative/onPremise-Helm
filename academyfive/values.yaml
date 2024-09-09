@@ -28,31 +28,33 @@ a5Chart:
   deployment:
     academyfiveReplicas: 1
     image: <YOUR_IMAGE_LOCATION>
-    cpuLimits: 3000m
-    cpuRequests: 2000m
-    memoryLimits: 6G
-    memoryRequests: 4G
-    cron:
-      cpuLimits: 2048m
-      cpuRequests: 2048m
-      memoryLimits: 16G
-      memoryRequests: 16G
-    #Deployment values for Logs can be left as default for most systems.
-    academyfiveAcademyLogs:
-      cpuLimits: 250m
-      cpuRequests: 10m
-      memoryLimits: 256Mi
-      memoryRequests: 100Mi
-    academyfiveErrorLogs:
-      cpuLimits: 250m
-      cpuRequests: 10m
-      memoryLimits: 256Mi
-      memoryRequests: 100Mi
-    academyfiveDataAccessLogs:
-      cpuLimits: 250m
-      cpuRequests: 10m
-      memoryLimits: 256Mi
-      memoryRequests: 100Mi
+
+    # OVERRIDE LIMIT VALUES HERE
+
+    # cpuLimits: 4096m
+    # cpuRequests: 2048m
+    # memoryLimits: 8G
+    # memoryRequests: 4G
+    # academyfiveAcademyLogs:
+    #   cpuLimits: 250m
+    #   cpuRequests: 10m
+    #   memoryLimits: 256Mi
+    #   memoryRequests: 100Mi
+    # academyfiveErrorLogs:
+    #   cpuLimits: 250m
+    #   cpuRequests: 10m
+    #   memoryLimits: 256Mi
+    #   memoryRequests: 100Mi
+    # academyfiveDataAccessLogs:
+    #   cpuLimits: 250m
+    #   cpuRequests: 10m
+    #   memoryLimits: 256Mi
+    #   memoryRequests: 100Mi
+    # cron:
+    #   cpuLimits: 4096m
+    #   cpuRequests: 2048m
+    #   memoryLimits: 32G
+    #   memoryRequests: 16G
 
   logging:
     # Will create an emptyDir volume for logs if set to false or a persistentVolumeClaim if set to true
@@ -107,12 +109,18 @@ casChart:
 
   deployment:
     image: <YOUR_IMAGE_LOCATION>
-  #Deployment values for Logs can be left as default for most systems.
-  casPhpFpmLogs:
-    cpuLimits: 250m
-    cpuRequests: 10m
-    memoryLimits: 256Mi
-    memoryRequests: 100Mi
+
+    # OVERRIDE LIMIT VALUES HERE
+
+    # cpuLimits: 2000m
+    # cpuRequests: 1000m
+    # memoryLimits: 2G
+    # memoryRequests: 1G
+    # casPhpFpmLogs:
+    #   cpuLimits: 250m
+    #   cpuRequests: 10m
+    #   memoryLimits: 256Mi
+    #   memoryRequests: 100Mi
 
 a5Ingress:
   enabled: true
@@ -120,9 +128,9 @@ a5Ingress:
 casIngress:
   enabled: true
   casHosts:
-  - name: application.university.com
-  - name: community.university.com
-  - name: pwa.university.com
+    - name: application.university.com
+    - name: community.university.com
+    - name: pwa.university.com
 
 sharedResourcesNginx:
   enabled: true
