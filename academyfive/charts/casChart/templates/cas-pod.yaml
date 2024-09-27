@@ -47,7 +47,7 @@ spec:
               cpu: {{ .Values.deployment.cpuRequests }}
         - name: cas-php-fpm-logs
           image: busybox
-          command: [ "sh","-c","tail -F /var/log/php/php8.1-fpm.log" ]
+          command: [ "sh","-c","tail -F /var/log/php/php8.2-fpm.log" ]
           volumeMounts:
             - name: cas-logs-volume
               mountPath: /var/log/php

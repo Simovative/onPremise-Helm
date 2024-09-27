@@ -23,6 +23,8 @@ data:
   CA_CERT_FILE: {{ .Values.global.ca_cert_file }}
   CA_CERT_VALUE: {{ .Values.global.ca_cert_value }}
   {{- end }}
-
   # backwards compatibility with pre 16.06.x
   AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
+  {{- if not (eq .Values.envData.METRICS_SCRAPER_IP "")}}
+  METRICS_SCRAPER_IP: {{ .Values.envData.METRICS_SCRAPER_IP }}
+  {{- end }}

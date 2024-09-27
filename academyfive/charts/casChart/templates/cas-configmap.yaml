@@ -15,6 +15,9 @@ data:
   {{- if not (eq .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL "")}}
   CAS_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL }}
   {{- end }}
+  {{- if not (eq .Values.envData.METRICS_SCRAPER_IP "")}}
+  METRICS_SCRAPER_IP: {{ .Values.envData.METRICS_SCRAPER_IP }}
+  {{- end }}
   SECRET_REGION: {{ .Values.envData.SECRET_REGION }}
   REDIS_SESSION_ENDPOINT: {{ .Values.envData.REDIS_SESSION.ENDPOINT }}
   REDIS_SESSION_IS_CLUSTER: {{ .Values.envData.REDIS_SESSION.IS_CLUSTER | quote }}
