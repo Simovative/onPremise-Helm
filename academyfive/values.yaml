@@ -72,9 +72,13 @@ a5Chart:
     size: 2Gi
 
   autoscaler:
+    enabled: true
     minReplicas: 2
     maxReplicas: 10
     targetCPUUtilizationPercentage: 40
+
+  keda:
+    enabled: false
 
 casChart:
   enabled: true
@@ -103,9 +107,13 @@ casChart:
     storageClass: "-"
     size: 2Gi
   autoscaler:
+    enabled: true
     minReplicas: 2
     maxReplicas: 10
     targetCPUUtilizationPercentage: 50
+
+  keda:
+    enabled: false
 
   deployment:
     image: <YOUR_IMAGE_LOCATION>
