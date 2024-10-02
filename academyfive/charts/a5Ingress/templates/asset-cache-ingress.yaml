@@ -16,23 +16,16 @@ metadata:
   {{- end }}
     # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/keep-alive: "5"
-
     nginx.ingress.kubernetes.io/proxy-buffering: {{ quote .Values.assets.proxyBuffering }}
     # proxy-body-size is client_max_body_size
     nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.assets.proxyBodySize }}
     nginx.ingress.kubernetes.io/client-body-buffer-size: {{ .Values.assets.clientBodyBufferSize }}
-
     nginx.ingress.kubernetes.io/client-body-timeout: "36000"
     nginx.ingress.kubernetes.io/large-client-header-buffers: "2 1k"
     nginx.ingress.kubernetes.io/client-header-buffer-size: "2k"
     nginx.ingress.kubernetes.io/proxy-buffer-number: "16"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-
     nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_502"
-
-    nginx.ingress.kubernetes.io/keep-alive-requests: "10000"
-
     nginx.ingress.kubernetes.io/client-header-timeout: "36000"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ quote .Values.assets.proxyConnectTimeout }}
     nginx.ingress.kubernetes.io/proxy-read-timeout: {{ quote .Values.assets.proxyReadTimeout }}
@@ -50,6 +43,13 @@ metadata:
       add_header Ingress-Resource "ingress-academy-assets";
       #proxy_cache_bypass $http_x_purge;
       proxy_cache_key $scheme://$host$uri$is_args$query_string;
+
+    nginx.ingress.kubernetes.io/keep-alive: "5"
+    nginx.ingress.kubernetes.io/keep-alive-requests: "10000"
+    nginx.ingress.kubernetes.io/use-gzip: "true"
+    nginx.ingress.kubernetes.io/gzip-level: "6"
+    nginx.ingress.kubernetes.io/use-http2: "true"
+
 spec:
   {{- if .Values.assets.tlsSecretName }}
   tls:
