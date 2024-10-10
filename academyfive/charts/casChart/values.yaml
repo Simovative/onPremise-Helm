@@ -47,6 +47,7 @@ storage:
   size: 2Gi
 
 autoscaler:
+  enabled: true
   minReplicas: 2
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
@@ -63,6 +64,9 @@ autoscaler:
     shortScaleUpPeriodPodPercent: 100
     longScaleUpPeriod: 120
     longScaleUpPeriodPodAmount: 5
+
+keda:
+  enabled: false
 
 service:
   type: ClusterIP
