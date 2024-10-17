@@ -1,8 +1,9 @@
+{{- if .Values.autoscaler.enabled (not .Values.keda.enabled) -}}
 # horizontal pod autoscaler for academy-deployment
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: academy-hpa
+  name: {{ include "a5Chart.fullname" . }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -42,3 +43,4 @@ spec:
         - periodSeconds: {{ .Values.autoscaler.scaleUp.shortScaleUpPeriod }}
           type: Percent
           value: {{ .Values.autoscaler.scaleUp.shortScaleUpPeriodPodPercent }}
+{{- end }}
