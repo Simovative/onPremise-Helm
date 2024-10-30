@@ -1,0 +1,18 @@
+{{- if .Values.academy_file_storage_volume.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # This name uniquely identifies the PVC. This is used in deployment.
+  name: {{ .Values.academy_file_storage_volume.name }}
+spec:
+  {{- if not (eq "-" .Values.academy_file_storage_volume.storageClass) }}
+  storageClassName: "{{ .Values.academy_file_storage_volume.storageClass }}"
+  {{- end }}
+  accessModes:
+    # The volume is mounted as read-write by Multiple nodes
+    - ReadWriteMany
+  resources:
+    # This is the request for storage. Should be available in the cluster.
+    requests:
+      storage: {{ .Values.academy_file_storage_volume.size }}
+{{- end }}

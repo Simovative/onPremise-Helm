@@ -10,7 +10,11 @@ data:
   CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
   S3_REGION: {{ .Values.envData.S3_REGION }}
   IS_CRON_SERVICE: "1"
+  A5_FILE_STORAGE_TYPE: {{ quote .Values.infrastructureData.file_storage_type }}
   AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
+  {{- if not (eq .Values.envData.CAS_FILE_STORAGE_LOCATION "") }}
+  CAS_FILE_STORAGE_LOCATION: {{ .Values.envData.CAS_FILE_STORAGE_LOCATION }}
+  {{- end }}
   AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
   # backwards compatibility with pre 16.06.x
   AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}

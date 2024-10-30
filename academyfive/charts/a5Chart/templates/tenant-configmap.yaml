@@ -12,10 +12,14 @@ data:
     "database_location": {{ quote .Values.infrastructureData.database_write_location }},
     "database_read_location": {{ quote .Values.infrastructureData.database_read_location }},
     "database_write_location": {{ quote .Values.infrastructureData.database_write_location }},
-    "filestorage_type": {{ quote .Values.infrastructureData.filestorage_type }},
+    "filestorage_type": {{ quote .Values.infrastructureData.file_storage_type }},
+    {{- if not (eq .Values.infrastructureData.a5_file_storage_location "") }}
+    "filestorage_location": {{ quote .Values.infrastructureData.a5_file_storage_location }},
+    {{- else }}
     "filestorage_location": "s3://{{.Values.envData.A5_BUCKET_NAME}}",
+    {{- end }}
     {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "")}}
-    "filestorage_endpoint_url": {{ quote .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }},
+    "file_storage_endpoint_url": {{ quote .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }},
     {{- end }}
     "session_type": {{ quote .Values.infrastructureData.session_type }},
     "session_location": {{ quote .Values.envData.REDIS_SESSION.ENDPOINT }},
@@ -40,8 +44,12 @@ data:
     "database_location": {{ quote .Values.infrastructureData.database_write_location }},
     "database_read_location": {{ quote .Values.infrastructureData.database_read_location }},
     "database_write_location": {{ quote .Values.infrastructureData.database_write_location }},
-    "filestorage_type": {{ quote .Values.infrastructureData.filestorage_type }},
+    "filestorage_type": {{ quote .Values.infrastructureData.file_storage_type }},
+    {{- if not (eq .Values.infrastructureData.a5_file_storage_location "") }}
+    "filestorage_location": {{ quote .Values.infrastructureData.a5_file_storage_location }},
+    {{- else }}
     "filestorage_location": "s3://{{.Values.envData.A5_BUCKET_NAME}}",
+    {{- end }}
     {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "")}}
     "filestorage_endpoint_url": {{ quote .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }},
     {{- end }}

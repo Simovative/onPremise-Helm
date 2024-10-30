@@ -7,6 +7,8 @@ envData:
   CAS_BUCKET_NAME: "casbucket"
   ASSET_SOURCE: "academy"
   CAS_FILESTORAGE_ENDPOINT_URL: ""
+  CAS_FILE_STORAGE_TYPE: "s3"
+  CAS_FILE_STORAGE_LOCATION: ""
   METRICS_SCRAPER_IP: ""
   SECRET_REGION: "eu-central-1"
   REDIS_SESSION:
@@ -21,7 +23,7 @@ envData:
 deployment:
   replicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: release-B450
+  versionTag: release-B451
   serviceAccountName: default
   cpuLimits: 2000m
   cpuRequests: 1000m
@@ -32,6 +34,12 @@ deployment:
     cpuRequests: 10m
     memoryLimits: 256Mi
     memoryRequests: 100Mi
+
+cas_file_storage_volume:
+  enabled: false
+  name: "cas-file-storage-volume"
+  storageClass: "-"
+  size: 50Gi
 
 logging:
   # For more information: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir

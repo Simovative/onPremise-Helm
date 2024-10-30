@@ -23,6 +23,10 @@ spec:
           volumeMounts:
             - name: infrastructure-config-dir-volume
               mountPath: /run/config
+            {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
+            - name: academy-files-volume
+              mountPath: {{ .Values.infrastructureData.a5_file_storage_location }}
+            {{- end }}
           resources:
             limits:
               memory: {{ .Values.deployment.cron.memoryLimits }}
@@ -36,3 +40,8 @@ spec:
         - name: infrastructure-config-dir-volume
           configMap:
             name: academy-infrastructure-config-dir
+        {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
+        - name: academy-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.academy_file_storage_volume.name }}
+        {{- end }}

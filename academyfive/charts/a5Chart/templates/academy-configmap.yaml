@@ -12,8 +12,12 @@ data:
   ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
   S3_ASSETS_URL: {{ .Values.global.domain }}
   S3_ACADEMY_ASSETS_DOMAIN: {{ .Values.global.domain }}
-  {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "")}}
+  A5_FILE_STORAGE_TYPE: {{ quote .Values.infrastructureData.file_storage_type }}
+  {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "" ) }}
   AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
+  {{- end }}
+  {{- if not (eq .Values.envData.CAS_FILE_STORAGE_LOCATION "" ) }}
+  CAS_FILE_STORAGE_LOCATION: {{ quote .Values.envData.CAS_FILE_STORAGE_LOCATION }}
   {{- end }}
   AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
   {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}

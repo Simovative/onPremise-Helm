@@ -15,6 +15,10 @@ data:
   {{- if not (eq .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL "")}}
   CAS_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL }}
   {{- end }}
+  CAS_FILE_STORAGE_TYPE: {{ .Values.envData.CAS_FILE_STORAGE_TYPE }}
+  {{- if not (eq .Values.envData.CAS_FILE_STORAGE_LOCATION "") }}
+  CAS_FILE_STORAGE_LOCATION: {{ .Values.envData.CAS_FILE_STORAGE_LOCATION }}
+  {{- end }}
   {{- if not (eq .Values.envData.METRICS_SCRAPER_IP "")}}
   METRICS_SCRAPER_IP: {{ .Values.envData.METRICS_SCRAPER_IP }}
   {{- end }}

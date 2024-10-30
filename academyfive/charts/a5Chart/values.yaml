@@ -9,6 +9,7 @@ envData:
   S3_REGION: "eu-central-1"
   ASSET_SOURCE: "academy"
   A5_FILESTORAGE_ENDPOINT_URL: ""
+  CAS_FILE_STORAGE_LOCATION: ""
   A5_INFRASTRUCTURE_CONFIG: "/run/config"
   METRICS_SCRAPER_IP: ""
   TIDEWAYS_CONNECTION: "" #tcp://tideways:9135
@@ -26,12 +27,17 @@ infrastructureData:
   database_type: "mysql"
   database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<databaseName>"
   database_write_location: "mysql://<YOUR_WRITE_USER>:<PASSWORD>@<WRITER_END_POINT>/<DATABASE_NAME>"
-  filestorage_type: "s3"
+  file_storage_type: "s3"
+  cas_file_storage_volume_claim_name: "cas-file-storage-volume"
+  a5_file_storage_location: ""
   session_type: "redis"
   session_cluster: true
   cache_type: "redis"
   maintenance_mode: false
   aws_region: "eu-central-1"
+
+migration:
+  executeMigration: true
 
 deployment:
   academyfiveReplicas: 1
@@ -62,6 +68,12 @@ deployment:
     cpuRequests: 2048m
     memoryLimits: 32G
     memoryRequests: 16G
+
+academy_file_storage_volume:
+  enabled: false
+  name: "academy-file-storage-volume"
+  storageClass: "-"
+  size: 50Gi
 
 logging:
   usePersistentVolume: false

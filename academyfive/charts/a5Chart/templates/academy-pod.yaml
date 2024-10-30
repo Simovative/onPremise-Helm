@@ -41,6 +41,14 @@ spec:
               mountPath: /mnt/shared-secret-volume
             - name: academy-logs-volume
               mountPath: /srv/a5_source/files/log
+            # a5 filestorge mount
+            {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
+            - name: academy-files-volume
+              mountPath: {{ .Values.infrastructureData.a5_file_storage_location }}
+            # cas file_storage mount
+            - name: cas-files-volume
+              mountPath: {{ .Values.envData.CAS_FILE_STORAGE_LOCATION }}
+            {{- end }}
           resources:
             limits:
               memory: {{ .Values.deployment.memoryLimits }}
@@ -96,6 +104,7 @@ spec:
         - name: secret-volume
           secret:
             secretName: cas-a5-api-shared-secret
+        # academy logs volume
         - name: academy-logs-volume
         {{- if .Values.logging.usePersistentVolume }}
           persistentVolumeClaim:
@@ -104,4 +113,15 @@ spec:
           emptyDir:
             # eviction manager keeps monitoring the disk space the emptyDir-Volume and, will evict pods when the usage exceeds the limit.
             sizeLimit: {{ .Values.logging.logSizeLimit }}
+        {{- end }}
+        # file_storage volume
+        {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
+        - name: academy-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.academy_file_storage_volume.name }}
+        {{- if .Values.infrastructureData.cas_file_storage_volume_claim_name }}
+        - name: cas-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.infrastructureData.cas_file_storage_volume_claim_name }}
+        {{- end }}
         {{- end }}

@@ -1,3 +1,4 @@
+{{- if .Values.migration.executeMigration }}
 # starts database migration
 apiVersion: batch/v1
 kind: Job
@@ -31,6 +32,11 @@ spec:
           volumeMounts:
             - name: infrastructure-config-dir-volume
               mountPath: /run/config
+            # a5 filestorge mount
+            {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
+            - name: academy-files-volume
+              mountPath: {{ .Values.infrastructureData.a5_file_storage_location }}
+            {{- end }}
           resources:
             limits:
               cpu: {{ .Values.deployment.cpuLimits }}
@@ -42,3 +48,10 @@ spec:
         - name: infrastructure-config-dir-volume
           configMap:
             name: academy-infrastructure-config-dir
+        # file_storage volume
+        {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
+        - name: academy-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.academy_file_storage_volume.name }}
+        {{- end }}
+{{- end }}

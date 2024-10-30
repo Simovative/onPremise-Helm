@@ -38,6 +38,10 @@ spec:
               mountPath: /mnt/shared-secret-volume
             - name: cas-logs-volume
               mountPath: /var/log/php
+            {{- if (eq "file" .Values.envData.CAS_FILE_STORAGE_TYPE) }}
+            - name: cas-files-volume
+              mountPath: {{ .Values.envData.CAS_FILE_STORAGE_LOCATION }}
+            {{- end }}
           resources:
             limits:
               memory: {{ .Values.deployment.memoryLimits }}
@@ -71,4 +75,10 @@ spec:
         {{- else }}
           emptyDir:
             sizeLimit: {{ .Values.logging.logSizeLimit }}
+        {{- end }}
+        # file_storage volume
+        {{- if (eq "file" .Values.envData.CAS_FILE_STORAGE_TYPE) }}
+        - name: cas-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.cas_file_storage_volume.name }}
         {{- end }}
