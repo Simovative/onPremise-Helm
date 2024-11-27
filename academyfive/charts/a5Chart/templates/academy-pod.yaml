@@ -13,6 +13,7 @@ spec:
       labels:
         app: academy-app
         image-version: {{ .Values.deployment.versionTag }}
+        checksum/config: {{ include (print $.Template.BasePath "/academy-configmap.yaml") . | sha1sum }}
     spec:
       serviceAccountName: {{ .Values.deployment.serviceAccountName }}
       hostAliases:
