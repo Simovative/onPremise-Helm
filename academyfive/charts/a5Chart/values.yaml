@@ -22,7 +22,6 @@ envData:
     ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
     IS_CLUSTER: 1
     AUTH: "no_auth"
-
 infrastructureData:
   database_type: "mysql"
   database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<databaseName>"
@@ -35,14 +34,12 @@ infrastructureData:
   cache_type: "redis"
   maintenance_mode: false
   aws_region: "eu-central-1"
-
 migration:
   executeMigration: true
-
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V17.12.2
+  versionTag: V17.11.11
   serviceAccountName: default
   cpuLimits: 4096m
   cpuRequests: 2048m
@@ -68,21 +65,18 @@ deployment:
     cpuRequests: 2048m
     memoryLimits: 32G
     memoryRequests: 16G
-
 academy_file_storage_volume:
   enabled: false
   name: "academy-file-storage-volume"
   storageClass: "-"
   size: 50Gi
-
 logging:
   usePersistentVolume: false
   logSizeLimit: 500Mi
-
 storage:
   storageClass: "-"
   size: 2Gi
-
+autoscalerIntegration: "hpa"
 autoscaler:
   minReplicas: 2
   maxReplicas: 10
@@ -100,7 +94,6 @@ autoscaler:
     shortScaleUpPeriodPodPercent: 100
     longScaleUpPeriod: 120
     longScaleUpPeriodPodAmount: 5
-
 service:
   type: ClusterIP
   port: 80

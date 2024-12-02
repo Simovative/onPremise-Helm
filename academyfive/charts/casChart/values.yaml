@@ -19,7 +19,6 @@ envData:
     ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
     IS_CLUSTER: 1
     AUTH: "no_auth"
-
 deployment:
   replicas: 1
   image: <YOUR_IMAGE_LOCATION>
@@ -34,26 +33,23 @@ deployment:
     cpuRequests: 10m
     memoryLimits: 256Mi
     memoryRequests: 100Mi
-
 cas_file_storage_volume:
   enabled: false
   name: "cas-file-storage-volume"
   storageClass: "-"
   size: 50Gi
-
 logging:
   # For more information: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
-    usePersistentVolume: false
-    # EmptyDir-SizeLimit. Will be ignored if usePersistentVolume is true
-    logSizeLimit: 500Mi
-
+  usePersistentVolume: false
+  # EmptyDir-SizeLimit. Will be ignored if usePersistentVolume is true
+  logSizeLimit: 500Mi
 storage:
   ## Will resolve to storageClassName: <storageClass>
   ## If set to "-" the storageClassName will be omitted and the default storageClass will be used:
   # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
   storageClass: "-"
   size: 2Gi
-
+autoscalerIntegration: "hpa"
 autoscaler:
   minReplicas: 2
   maxReplicas: 10
@@ -71,7 +67,6 @@ autoscaler:
     shortScaleUpPeriodPodPercent: 100
     longScaleUpPeriod: 120
     longScaleUpPeriodPodAmount: 5
-
 service:
   type: ClusterIP
   port: 80
