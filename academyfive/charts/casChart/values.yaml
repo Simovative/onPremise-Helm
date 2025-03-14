@@ -10,6 +10,7 @@ envData:
   CAS_FILE_STORAGE_TYPE: "s3"
   CAS_FILE_STORAGE_LOCATION: ""
   METRICS_SCRAPER_IP: ""
+  CAS_NESTED_PROXY_COUNT: "1"
   SECRET_REGION: "eu-central-1"
   REDIS_SESSION:
     ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
@@ -22,7 +23,7 @@ envData:
 deployment:
   replicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: release-B459
+  versionTag: release-B460
   serviceAccountName: default
   cpuLimits: 2000m
   cpuRequests: 1000m

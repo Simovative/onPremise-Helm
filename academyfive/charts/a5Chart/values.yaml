@@ -14,6 +14,7 @@ envData:
   METRICS_SCRAPER_IP: ""
   TIDEWAYS_CONNECTION: "" #tcp://tideways:9135
   TIDEWAYS_API_KEY: ""
+  A5_NESTED_PROXY_COUNT: "1"
   REDIS_SESSION:
     ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
     IS_CLUSTER: 1
@@ -39,7 +40,7 @@ migration:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V17.15.2
+  versionTag: V17.14.12
   serviceAccountName: default
   cpuLimits: 4096m
   cpuRequests: 2048m
