@@ -65,14 +65,14 @@ spec:
           # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
           # https://github.com/google/re2/wiki/Syntax
           - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: academy
                 port:
                   number: 80
           - path: /cms/data/community/.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: academy
@@ -86,14 +86,14 @@ spec:
           # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
           # https://github.com/google/re2/wiki/Syntax
           - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: academy
                 port:
                   number: 80
           - path: /cms/data/community/.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: academy
