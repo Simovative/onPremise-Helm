@@ -35,3 +35,6 @@ data:
   TIDEWAYS_API_KEY: {{ .Values.envData.TIDEWAYS_API_KEY }}
   TIDEWAYS_CONNECTION: {{ .Values.envData.TIDEWAYS_CONNECTION }}
   A5_NESTED_PROXY_COUNT: {{ .Values.envData.A5_NESTED_PROXY_COUNT | quote }}
+  {{- if not (eq .Values.envData.CSP_ENDPOINT_URL "")}}
+  CSP_ENDPOINT_URL: {{.Values.envData.CSP_ENDPOINT_URL}}
+  {{- end }}
