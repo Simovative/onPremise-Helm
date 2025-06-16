@@ -17,8 +17,8 @@ metadata:
     # proxy-body-size is client_max_body_size
     nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.ingress.proxyBodySize }}
     nginx.ingress.kubernetes.io/client-body-timeout: "36000"
-    nginx.ingress.kubernetes.io/large-client-header-buffers: "2 1k"
-    nginx.ingress.kubernetes.io/client-header-buffer-size: "2k"
+    nginx.ingress.kubernetes.io/large-client-header-buffers: {{ .Values.ingress.largeClientHeaderBuffers }}
+    nginx.ingress.kubernetes.io/client-header-buffer-size: {{ .Values.ingress.clientHeaderBufferSize }}
     nginx.ingress.kubernetes.io/client-header-timeout: "36000"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ quote .Values.ingress.proxyConnectTimeout }}
     nginx.ingress.kubernetes.io/proxy-read-timeout: {{ quote .Values.ingress.proxyReadTimeout }}
