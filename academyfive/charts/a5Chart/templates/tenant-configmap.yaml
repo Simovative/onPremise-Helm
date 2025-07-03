@@ -53,6 +53,8 @@ data:
     {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "")}}
     "filestorage_endpoint_url": {{ quote .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }},
     {{- end }}
+    "oas_a5_domain": {{ quote .Values.infrastructureData.oas_a5_domain }},
+    "services_domain": {{ quote .Values.infrastructureData.services_domain }},
     "session_type": {{ quote .Values.infrastructureData.session_type }},
     "session_location": {{ quote .Values.envData.REDIS_SESSION.ENDPOINT }},
     "session_cluster": {{ .Values.envData.REDIS_SESSION.IS_CLUSTER | quote }},
