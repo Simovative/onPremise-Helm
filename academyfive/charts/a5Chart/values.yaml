@@ -1,6 +1,9 @@
 # Default values for a5Chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+global:
+  domain: "a5.university.com"
+
 envData:
   CAS_A5_API_SECRET_LOCATION: "/mnt/shared-secret-volume/sharedSecret"
   A5_BUCKET_NAME: "a5bucket"
@@ -43,7 +46,7 @@ migration:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V17.20.8
+  versionTag: V17.21
   serviceAccountName: default
   cpuLimits: 4096m
   cpuRequests: 2048m

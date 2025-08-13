@@ -1,0 +1,15 @@
+# CHART_PATH/tests/academy_service_test.yaml
+suite: a5Chart - Academy Service
+templates:
+  - academy-service.yaml
+tests:
+  - it: should be a service and match properly
+    asserts:
+      - isKind:
+          of: Service
+      - matchRegex:
+          path: metadata.name
+          pattern: academy
+      - matchRegex:
+          path: spec.selector.app
+          pattern: academy-app

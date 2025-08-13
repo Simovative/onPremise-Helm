@@ -1,0 +1,212 @@
+suite: a5Chart - Tenant ConfigMap
+templates:
+  - tenant-configmap.yaml
+tests:
+  - it: should create a ConfigMap with the correct name
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: academy-infrastructure-config-dir
+
+  - it: should include the domain data
+    set:
+      global.domain: "example.com"
+      global.tenant_id: "example-tenant"
+      infrastructureData.database_type: "mysql"
+      infrastructureData.database_write_location: "mysql://writer:pass@writer.university.com/academyfive"
+      infrastructureData.database_read_location: "mysql://user:pass@reader.university.com/academyfive"
+      infrastructureData.file_storage_type: "s3"
+      infrastructureData.a5_file_storage_location: "s3://a5Bucket"
+      infrastructureData.oas_a5_domain: "oas.example.com"
+      infrastructureData.services_domain: "services.example.com"
+      infrastructureData.session_type: "redis"
+      envData.REDIS_SESSION.ENDPOINT: "redis-session:6379"
+      envData.REDIS_SESSION.IS_CLUSTER: "false"
+      infrastructureData.cache_type: "redis"
+      envData.REDIS_CACHE.ENDPOINT: "redis-cache:6379"
+      envData.REDIS_CACHE.IS_CLUSTER: "true"
+      infrastructureData.maintenance_mode: false
+      infrastructureData.aws_region: "eu-central-1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isSubset:
+          path: data
+          content:
+            example.com: |
+              {
+              "Url": "example.com",
+              "tenant_id": "example-tenant",
+              "database_type": "mysql",
+              "database_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "database_read_location": "mysql://user:pass@reader.university.com/academyfive",
+              "database_write_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "filestorage_type": "s3",
+              "filestorage_location": "s3://a5Bucket",
+              "oas_a5_domain": "oas.example.com",
+              "services_domain": "services.example.com",
+              "session_type": "redis",
+              "session_location": "redis-session:6379",
+              "session_cluster": "false",
+              "cache_type": "redis",
+              "cache_location": {
+                "clusterType": "true",
+                "url":  "redis-cache:6379"
+              },
+              "maintenance_mode": false,
+              "aws_region": "eu-central-1"
+              }
+
+  - it: should include filestorage_endpoint_url when specified
+    set:
+      global.domain: "example.com"
+      global.tenant_id: "example-tenant"
+      infrastructureData.database_type: "mysql"
+      infrastructureData.database_write_location: "mysql://writer:pass@writer.university.com/academyfive"
+      infrastructureData.database_read_location: "mysql://user:pass@reader.university.com/academyfive"
+      infrastructureData.file_storage_type: "s3"
+      infrastructureData.a5_file_storage_location: "s3://a5Bucket"
+      envData.A5_FILESTORAGE_ENDPOINT_URL: "http://minio:9000"
+      infrastructureData.oas_a5_domain: "oas.example.com"
+      infrastructureData.services_domain: "services.example.com"
+      infrastructureData.session_type: "redis"
+      envData.REDIS_SESSION.ENDPOINT: "redis-session:6379"
+      envData.REDIS_SESSION.IS_CLUSTER: "false"
+      infrastructureData.cache_type: "redis"
+      envData.REDIS_CACHE.ENDPOINT: "redis-cache:6379"
+      envData.REDIS_CACHE.IS_CLUSTER: "true"
+      infrastructureData.maintenance_mode: false
+      infrastructureData.aws_region: "eu-central-1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isSubset:
+          path: data
+          content:
+            example.com: |
+              {
+              "Url": "example.com",
+              "tenant_id": "example-tenant",
+              "database_type": "mysql",
+              "database_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "database_read_location": "mysql://user:pass@reader.university.com/academyfive",
+              "database_write_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "filestorage_type": "s3",
+              "filestorage_location": "s3://a5Bucket",
+              "filestorage_endpoint_url": "http://minio:9000",
+              "oas_a5_domain": "oas.example.com",
+              "services_domain": "services.example.com",
+              "session_type": "redis",
+              "session_location": "redis-session:6379",
+              "session_cluster": "false",
+              "cache_type": "redis",
+              "cache_location": {
+                "clusterType": "true",
+                "url":  "redis-cache:6379"
+              },
+              "maintenance_mode": false,
+              "aws_region": "eu-central-1"
+              }
+
+  - it: should use default filestorage_location when a5_file_storage_location is empty
+    set:
+      global.domain: "example.com"
+      global.tenant_id: "example-tenant"
+      infrastructureData.database_type: "mysql"
+      infrastructureData.database_write_location: "mysql://writer:pass@writer.university.com/academyfive"
+      infrastructureData.database_read_location: "mysql://user:pass@reader.university.com/academyfive"
+      infrastructureData.file_storage_type: "s3"
+      infrastructureData.a5_file_storage_location: ""
+      envData.A5_BUCKET_NAME: "a5Bucket"
+      infrastructureData.oas_a5_domain: "oas.example.com"
+      infrastructureData.services_domain: "services.example.com"
+      infrastructureData.session_type: "redis"
+      envData.REDIS_SESSION.ENDPOINT: "redis-session:6379"
+      envData.REDIS_SESSION.IS_CLUSTER: "false"
+      infrastructureData.cache_type: "redis"
+      envData.REDIS_CACHE.ENDPOINT: "redis-cache:6379"
+      envData.REDIS_CACHE.IS_CLUSTER: "true"
+      infrastructureData.maintenance_mode: false
+      infrastructureData.aws_region: "eu-central-1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isSubset:
+          path: data
+          content:
+            example.com: |
+              {
+              "Url": "example.com",
+              "tenant_id": "example-tenant",
+              "database_type": "mysql",
+              "database_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "database_read_location": "mysql://user:pass@reader.university.com/academyfive",
+              "database_write_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "filestorage_type": "s3",
+              "filestorage_location": "s3://a5Bucket",
+              "oas_a5_domain": "oas.example.com",
+              "services_domain": "services.example.com",
+              "session_type": "redis",
+              "session_location": "redis-session:6379",
+              "session_cluster": "false",
+              "cache_type": "redis",
+              "cache_location": {
+                "clusterType": "true",
+                "url":  "redis-cache:6379"
+              },
+              "maintenance_mode": false,
+              "aws_region": "eu-central-1"
+              }
+
+  - it: should include Redis cache authentication when specified
+    set:
+      global.domain: "example.com"
+      global.tenant_id: "example-tenant"
+      infrastructureData.database_type: "mysql"
+      infrastructureData.database_write_location: "mysql://writer:pass@writer.university.com/academyfive"
+      infrastructureData.database_read_location: "mysql://user:pass@reader.university.com/academyfive"
+      infrastructureData.file_storage_type: "s3"
+      infrastructureData.a5_file_storage_location: "s3://a5Bucket"
+      infrastructureData.oas_a5_domain: "oas.example.com"
+      infrastructureData.services_domain: "services.example.com"
+      infrastructureData.session_type: "redis"
+      envData.REDIS_SESSION.ENDPOINT: "redis-session:6379"
+      envData.REDIS_SESSION.IS_CLUSTER: "false"
+      infrastructureData.cache_type: "redis"
+      envData.REDIS_CACHE.ENDPOINT: "redis-cache:6379"
+      envData.REDIS_CACHE.IS_CLUSTER: "true"
+      envData.REDIS_CACHE.AUTH: "password123"
+      infrastructureData.maintenance_mode: false
+      infrastructureData.aws_region: "eu-central-1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isSubset:
+          path: data
+          content:
+            example.com: |
+              {
+              "Url": "example.com",
+              "tenant_id": "example-tenant",
+              "database_type": "mysql",
+              "database_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "database_read_location": "mysql://user:pass@reader.university.com/academyfive",
+              "database_write_location": "mysql://writer:pass@writer.university.com/academyfive",
+              "filestorage_type": "s3",
+              "filestorage_location": "s3://a5Bucket",
+              "oas_a5_domain": "oas.example.com",
+              "services_domain": "services.example.com",
+              "session_type": "redis",
+              "session_location": "redis-session:6379",
+              "session_cluster": "false",
+              "cache_type": "redis",
+              "cache_location": {
+                "clusterType": "true",
+                "url":  "redis-cache:6379"
+                  ,"auth": "password123"
+              },
+              "maintenance_mode": false,
+              "aws_region": "eu-central-1"
+              }

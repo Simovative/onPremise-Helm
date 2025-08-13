@@ -1,0 +1,25 @@
+# CHART_PATH/tests/academy_service_test.yaml
+suite: a5ingress - asset cache ingress
+templates:
+  - asset-cache-ingress.yaml
+tests:
+  - it: should prefer assets.hostname over global.host
+    set:
+      assets.hostname: asset-cache.university.com
+      global.domain: example.university.com
+    asserts:
+      - isKind:
+          of: Ingress
+      - matchRegex:
+          path: spec.rules[0].host
+          pattern: asset-cache.university.com
+  - it: should use global.host when assets.hostname is empty
+    set:
+      assets.hostname: ""
+      global.domain: example.university.com
+    asserts:
+      - isKind:
+          of: Ingress
+      - matchRegex:
+          path: spec.rules[0].host
+          pattern: example.university.com

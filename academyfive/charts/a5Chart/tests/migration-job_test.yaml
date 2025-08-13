@@ -1,0 +1,17 @@
+suite: a5Chart - Migration Job executeMigration
+templates:
+  - migration-job.yaml
+tests:
+  - it: should run when executeMigration is enabled
+    set:
+      migration.executeMigration: true
+    asserts:
+      - isKind:
+          of: Job
+
+  - it: should not run when executeMigration is disabled
+    set:
+      migration.executeMigration: false
+    asserts:
+      - hasDocuments:
+          count: 0

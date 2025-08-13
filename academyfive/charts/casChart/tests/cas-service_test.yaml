@@ -1,0 +1,15 @@
+# CHART_PATH/tests/academy_service_test.yaml
+suite: casChart - CAS Service
+templates:
+  - cas-service.yaml
+tests:
+  - it: should be a service and match properly
+    asserts:
+      - isKind:
+          of: Service
+      - matchRegex:
+          path: metadata.name
+          pattern: cas
+      - matchRegex:
+          path: spec.selector.app
+          pattern: cas-app

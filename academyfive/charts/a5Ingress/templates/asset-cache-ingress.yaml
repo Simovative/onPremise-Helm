@@ -54,11 +54,11 @@ spec:
   {{- if .Values.assets.tlsSecretName }}
   tls:
     - hosts:
-        - {{ quote .Values.global.hosts }}
+        - {{ .Values.assets.hostname | default .Values.global.hosts | quote }}
       secretName: {{ .Values.assets.tlsSecretName }}
   {{- end }}
   rules:
-    - host: {{ .Values.global.domain }}
+    - host: {{ .Values.assets.hostname | default .Values.global.domain }}
       http:
         paths:
           # ingress-nginx uses re2-regex-syntax
