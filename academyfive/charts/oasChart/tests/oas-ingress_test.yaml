@@ -1,0 +1,49 @@
+suite: oasChart - oas Ingress
+templates:
+  - oas-ingress.yaml
+tests:
+  - it: should be an ingress and default values match properly
+    set:
+      enabled: true
+    asserts:
+      - isKind:
+          of: Ingress
+      - matchRegex:
+          path: metadata.name
+          pattern: ingress-oas
+      - matchRegex:
+          path: spec.ingressClassName
+          pattern: nginx
+      # tls
+      - exists:
+          path: spec.tls
+      - equal:
+          path: spec.tls[0].hosts
+          value: ["oas-a5.university.com", "oas.university.com", "oas2.university.com"]
+      - equal:
+          path: spec.tls[0].secretName
+          value: academyfive.net-tls
+      # rules
+      - exists:
+          path: spec.rules
+      - equal:
+          path: spec.rules[0].host
+          value: oas-a5.university.com
+      - equal:
+          path: spec.rules[1].host
+          value: oas.university.com
+      - equal:
+          path: spec.rules[2].host
+          value: oas2.university.com
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
+      - equal:
+          path: spec.rules[0].http.paths[0].pathType
+          value: Prefix
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: oas
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.number
+          value: 80

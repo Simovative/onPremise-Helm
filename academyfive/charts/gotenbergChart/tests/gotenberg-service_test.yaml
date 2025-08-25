@@ -1,0 +1,17 @@
+# CHART_PATH/tests/gotenberg-service_test.yaml
+suite: gotenbergChart - Gotenberg Service
+templates:
+  - gotenberg-service.yaml
+tests:
+  - it: should be a service and match properly
+    set:
+      enabled: true
+    asserts:
+      - isKind:
+          of: Service
+      - matchRegex:
+          path: metadata.name
+          pattern: gotenberg
+      - matchRegex:
+          path: spec.selector.app
+          pattern: gotenberg-app

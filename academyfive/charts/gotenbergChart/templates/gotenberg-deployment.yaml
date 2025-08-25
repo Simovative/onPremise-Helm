@@ -1,0 +1,46 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gotenberg-deployment
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: gotenberg-app
+  template:
+    metadata:
+      labels:
+        app: gotenberg-app
+        image-version: "{{ .Values.deployment.versionTag }}"
+    spec:
+      containers:
+        - name: gotenberg
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          ports:
+            - containerPort: 3000
+              name: http
+          livenessProbe:
+            httpGet:
+              path: health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.envData }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+      {{- if .Values.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.deployment.imagePullSecrets }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,17 @@
+# CHART_PATH/tests/oas-service_test.yaml
+suite: oasChart - oas Service
+templates:
+  - oas-service.yaml
+tests:
+  - it: should be a service and match properly
+    set:
+      enabled: true
+    asserts:
+      - isKind:
+          of: Service
+      - matchRegex:
+          path: metadata.name
+          pattern: oas
+      - matchRegex:
+          path: spec.selector.app
+          pattern: oas-app

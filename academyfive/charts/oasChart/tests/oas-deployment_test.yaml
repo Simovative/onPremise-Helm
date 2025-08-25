@@ -1,0 +1,76 @@
+suite: oasChart - oas Deployment
+templates:
+  - oas-deployment.yaml
+tests:
+  - it: should be a deployment and include values-file properly
+    set:
+      enabled: true
+      deployment.image: 111111111111.dkr.ecr.eu-central-1.amazonaws.com/onpremise_oas
+      deployment.versionTag: release-233
+      deployment.replicas: 3
+      deployment.imagePullSecrets: "my-registry-secret"
+      deployment.resources:
+        requests:
+          cpu: 500m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+      deployment.envData:
+        OAS_A5_URL: "oas-a5.university.net"
+        OAS_S3_BUCKET: "oasbucket"
+    asserts:
+      - isKind:
+          of: Deployment
+      - matchRegex:
+          path: metadata.name
+          pattern: oas-deployment
+      - equal:
+          path: spec.replicas
+          value: 3
+      - matchRegex:
+          path: spec.template.metadata.labels.app
+          pattern: oas-app
+      - matchRegex:
+          path: spec.template.spec.containers[0].name
+          pattern: oas
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: 111111111111.dkr.ecr.eu-central-1.amazonaws.com/onpremise_oas:release-233
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 500m
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 512Mi
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 1000m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 1Gi
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OAS_A5_URL
+            value: "oas-a5.university.net"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OAS_S3_BUCKET
+            value: "oasbucket"
+      - equal:
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: my-registry-secret
+
+  - it: should handle empty resources properly
+    set:
+      enabled: true
+      deployment.resources: {}
+    asserts:
+      - isKind:
+          of: Deployment
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].resources
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].resources

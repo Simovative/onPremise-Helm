@@ -1,0 +1,22 @@
+enabled: true
+
+deployment:
+  replicas: 2
+  image: gotenberg/gotenberg
+  versionTag: 8.13
+  # set resources if needed
+  resources: {}
+  #  requests:
+  #    cpu: 1000m
+  #    memory: 1G
+  #  limits:
+  #    cpu: 2000m
+  #    memory: 2G
+  imagePullSecrets: ""  # Set to the name of your image pull secret if needed
+
+envData:
+  TZ: "Europe/Berlin"
+
+service:
+  type: ClusterIP
+  port: 80

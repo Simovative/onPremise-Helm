@@ -1,0 +1,43 @@
+enabled: true
+
+deployment:
+  replicas: 2
+  # configure image pulling
+  image: <YOUR_IMAGE_LOCATION>
+  versionTag: <YOUR_VERSION>
+  imagePullSecrets: "regcred"
+  # set resources if needed
+  resources: {}
+  #  requests:
+  #    cpu: 1000m
+  #    memory: 500M
+  #  limits:
+  #    cpu: 2000m
+  #    memory: 1G
+
+  envData:
+    #OAS_A5_URL: "oas-a5.university.com"
+    #OAS_S3_BUCKET: oasbucket
+    #OAS_S3_ENDPOINT_URL: "http://user:pass@minio.minio:9000"
+
+ingress:
+  oasHosts:
+    - name: oas-a5.university.com
+    - name: oas.university.com
+    - name: oas2.university.com
+
+  #If required provide your own labels and annotations
+  labels: {}
+  #examplelabel: examplevalue
+  annotations: {}
+    #alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    #alb.ingress.kubernetes.io/ssl-redirect: '443'
+    #alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:your-certificate-arn
+    #alb.ingress.kubernetes.io/scheme: internet-facing
+    #alb.ingress.kubernetes.io/target-type: ip
+  tlsSecretName: academyfive.net-tls
+  ingressClassName: nginx
+
+service:
+  type: ClusterIP
+  port: 80

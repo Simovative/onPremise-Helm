@@ -16,13 +16,13 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 17.21.2
+version: 17.20.11
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "V17.21.2"
+appVersion: "V17.20.11-stable"
 
 dependencies:
   - name: a5Chart
@@ -48,3 +48,11 @@ dependencies:
     condition: sharedResourcesNginx.enabled
     version: 1.0.0
     repository: "file://./charts/sharedResourcesNginx"
+  - name: gotenbergChart
+    condition: gotenbergChart.enabled
+    version: 1.0.0
+    repository: "file://./charts/gotenbergChart"
+  - name: oasChart
+    condition: oasChart.enabled
+    version: 1.0.0
+    repository: "file://./charts/oasChart"

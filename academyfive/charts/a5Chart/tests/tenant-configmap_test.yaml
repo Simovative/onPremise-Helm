@@ -47,6 +47,7 @@ tests:
               "filestorage_location": "s3://a5Bucket",
               "oas_a5_domain": "oas.example.com",
               "services_domain": "services.example.com",
+              "pdf_service_url": "",
               "session_type": "redis",
               "session_location": "redis-session:6379",
               "session_cluster": "false",
@@ -98,6 +99,7 @@ tests:
               "filestorage_endpoint_url": "http://minio:9000",
               "oas_a5_domain": "oas.example.com",
               "services_domain": "services.example.com",
+              "pdf_service_url": "",
               "session_type": "redis",
               "session_location": "redis-session:6379",
               "session_cluster": "false",
@@ -148,6 +150,7 @@ tests:
               "filestorage_location": "s3://a5Bucket",
               "oas_a5_domain": "oas.example.com",
               "services_domain": "services.example.com",
+              "pdf_service_url": "",
               "session_type": "redis",
               "session_location": "redis-session:6379",
               "session_cluster": "false",
@@ -160,7 +163,7 @@ tests:
               "aws_region": "eu-central-1"
               }
 
-  - it: should include Redis cache authentication when specified
+  - it: should include Redis cache authentication when specified and include pdf_service_url
     set:
       global.domain: "example.com"
       global.tenant_id: "example-tenant"
@@ -171,6 +174,7 @@ tests:
       infrastructureData.a5_file_storage_location: "s3://a5Bucket"
       infrastructureData.oas_a5_domain: "oas.example.com"
       infrastructureData.services_domain: "services.example.com"
+      infrastructureData.pdf_service_url: "http://gotenberg"
       infrastructureData.session_type: "redis"
       envData.REDIS_SESSION.ENDPOINT: "redis-session:6379"
       envData.REDIS_SESSION.IS_CLUSTER: "false"
@@ -198,6 +202,7 @@ tests:
               "filestorage_location": "s3://a5Bucket",
               "oas_a5_domain": "oas.example.com",
               "services_domain": "services.example.com",
+              "pdf_service_url": "http://gotenberg",
               "session_type": "redis",
               "session_location": "redis-session:6379",
               "session_cluster": "false",

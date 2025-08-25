@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-oas
+  {{- with .Values.ingress.labels }}
+  labels:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  annotations:
+  {{- with .Values.ingress.annotations }}
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+    # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header Ingress-Resource "ingress-oas";
+
+    nginx.ingress.kubernetes.io/use-gzip: "true"
+    nginx.ingress.kubernetes.io/gzip-level: "6"
+    nginx.ingress.kubernetes.io/use-http2: "true"
+spec:
+  {{- if .Values.ingress.tlsSecretName }}
+  tls:
+    - hosts:
+        {{- range $oasHosts := .Values.ingress.oasHosts }}
+        - {{ quote $oasHosts.name }}
+        {{- end }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+  {{- end }}
+  rules:
+  {{- range $oasHosts := .Values.ingress.oasHosts }}
+    - host: {{ $oasHosts.name }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: oas
+                port:
+                  number: 80
+  {{- end }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
