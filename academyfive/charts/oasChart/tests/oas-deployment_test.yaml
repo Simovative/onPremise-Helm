@@ -2,7 +2,7 @@ suite: oasChart - oas Deployment
 templates:
   - oas-deployment.yaml
 tests:
-  - it: should be a deployment and include values-file properly
+  - it: should render Deployment manifest with all provided values from values-file
     set:
       enabled: true
       deployment.image: 111111111111.dkr.ecr.eu-central-1.amazonaws.com/onpremise_oas
@@ -74,3 +74,36 @@ tests:
           path: spec.template.spec.containers[0].resources
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].resources
+
+  - it: should setup correct with file-storage-type file
+    set:
+      enabled: true
+      deployment.image: 111111111111.dkr.ecr.eu-central-1.amazonaws.com/onpremise_oas
+      deployment.versionTag: release-233
+      deployment.envData:
+        OAS_A5_URL: "oas-a5.university.net"
+        OAS_FILE_STORAGE_TYPE: "file"
+        OAS_FILE_STORAGE_LOCATION: "/mnt/test-oas-files"
+      oas_file_storage_volume:
+        enabled: true
+        name: "oas-file-storage-volume"
+        storageClass: "-"
+        size: 1Gi
+    asserts:
+      - isKind:
+          of: Deployment
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OAS_FILE_STORAGE_TYPE
+            value: "file"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OAS_FILE_STORAGE_LOCATION
+            value: "/mnt/test-oas-files"
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: oas-files-volume
+            mountPath: "/mnt/test-oas-files"

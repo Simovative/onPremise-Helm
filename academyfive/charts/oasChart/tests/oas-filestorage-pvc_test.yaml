@@ -1,0 +1,31 @@
+# CHART_PATH/tests/oas-service_test.yaml
+suite: oasChart - filestorage-pvc
+templates:
+  - oas-filestorage-pvc.yaml
+tests:
+  - it: should create pvc properly
+    set:
+      enabled: true
+      oas_file_storage_volume:
+        enabled: true
+        storageClass: "testclass"
+        size: 200Mi
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - matchRegex:
+          path: metadata.name
+          pattern: "oas-file-storage-volume"
+      - matchRegex:
+          path: spec.storageClassName
+          pattern: "testclass"
+      - matchRegex:
+          path: spec.resources.requests.storage
+          pattern: "200Mi"
+
+  - it: should be disabled by default
+    set:
+      enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0

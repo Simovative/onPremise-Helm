@@ -4,7 +4,7 @@ deployment:
   replicas: 2
   # configure image pulling
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: release-238
+  versionTag: release-239
   imagePullSecrets: "regcred"
   # set resources if needed
   resources: {}
@@ -17,8 +17,18 @@ deployment:
 
   envData:
     #OAS_A5_URL: "oas-a5.university.com"
+    #OAS_FILE_STORAGE_TYPE: "s3" #s3 or file
+  # required when OAS_FILE_STORAGE_TYPE is s3
     #OAS_S3_BUCKET: oasbucket
     #OAS_S3_ENDPOINT_URL: "http://user:pass@minio.minio:9000"
+  # required when OAS_FILE_STORAGE_TYPE is file
+    #OAS_FILE_STORAGE_LOCATION: "/mnt/oas-files"
+
+oas_file_storage_volume:
+  enabled: false
+  name: "oas-file-storage-volume"
+  storageClass: "-"
+  size: 5Gi
 
 ingress:
   oasHosts:

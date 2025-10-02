@@ -34,6 +34,11 @@ spec:
             periodSeconds: 10
           resources:
             {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- if eq "file" (default "" (get (default (dict) .Values.deployment.envData) "OAS_FILE_STORAGE_TYPE")) }}
+          volumeMounts:
+            - name: oas-files-volume
+              mountPath: {{ .Values.deployment.envData.OAS_FILE_STORAGE_LOCATION }}
+          {{- end }}
           env:
             {{- range $key, $value := .Values.deployment.envData }}
             - name: {{ $key }}
@@ -47,4 +52,10 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.deployment.imagePullSecrets }}
       {{- end }}
+      {{- if .Values.oas_file_storage_volume.enabled}}
+      volumes:
+        - name: oas-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.oas_file_storage_volume.name }}
+          {{- end }}
 {{- end }}
