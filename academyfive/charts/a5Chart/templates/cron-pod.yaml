@@ -12,6 +12,7 @@ spec:
       labels:
         app: academy-cron-app
         image-version: {{ .Values.deployment.versionTag }}
+        checksum/config: {{ include (print $.Template.BasePath "/cron-configmap.yaml") . | sha1sum }}
     spec:
       serviceAccountName: {{ .Values.deployment.serviceAccountName }}
       containers:

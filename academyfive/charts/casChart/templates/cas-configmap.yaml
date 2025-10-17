@@ -11,6 +11,7 @@ data:
   CAS_A5_API_PROTOCOL: {{ .Values.envData.CAS_A5_API_PROTOCOL | default "https" }}
   CAS_BUCKET_NAME: {{ .Values.envData.CAS_BUCKET_NAME }}
   ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
+  CAS_ASSETS_URL: {{ .Values.envData.CAS_ASSETS_URL | default .Values.global.domain }}
   S3_ASSETS_URL: {{ .Values.envData.S3_ASSETS_URL | default .Values.global.domain }}
   {{- if not (eq .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL "")}}
   CAS_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.CAS_FILESTORAGE_ENDPOINT_URL }}

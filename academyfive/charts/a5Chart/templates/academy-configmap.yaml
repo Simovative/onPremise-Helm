@@ -10,7 +10,8 @@ data:
   CAS_SERVICE_URL: {{ .Values.envData.CAS_SERVICE_URL}}
   S3_REGION: {{ .Values.envData.S3_REGION }}
   ASSET_SOURCE: {{ .Values.envData.ASSET_SOURCE }}
-  S3_ASSETS_URL: {{ .Values.global.domain }}
+  CAS_ASSETS_URL: {{ .Values.envData.CAS_ASSETS_URL | default .Values.global.domain | quote }}
+  S3_ASSETS_URL: {{ .Values.envData.CAS_ASSETS_URL | default .Values.global.domain | quote }} # deprecated
   S3_ACADEMY_ASSETS_DOMAIN: {{ .Values.global.domain }}
   A5_FILE_STORAGE_TYPE: {{ quote .Values.infrastructureData.file_storage_type }}
   {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "" ) }}
