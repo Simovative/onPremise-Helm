@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OnPremise Helm Repo – Versionen</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    h1 { margin: 0 0 8px; }
+    .sub { color: #555; margin-bottom: 18px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; max-width: 980px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { background: #fafafa; position: sticky; top: 0; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f2f2f2; font-size: 12px; }
+    details { margin: 6px 0; }
+    .muted { color: #666; font-size: 13px; }
+    .error { color: #b00020; }
+    input { width: 100%; max-width: 420px; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; }
+  </style>
+  <!-- YAML Parser (Client-side). Kein Build nötig. -->
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+</head>
+<body>
+  <h1>OnPremise Helm Repo – verfügbare Versionen</h1>
+  <div class="sub">Einfacher Überblick für alle – ohne Helm-Kenntnisse.</div>
+
+  <div class="card">
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
+      <div>
+        <div class="muted">Quelle: <span class="pill" id="src"></span></div>
+        <div class="muted">Stand: <span id="asof">lädt…</span></div>
+      </div>
+      <div style="min-width:260px; flex:1; max-width:420px;">
+        <input id="q" placeholder="Filtern nach Chart-Name oder Version…" />
+      </div>
+    </div>
+
+    <div id="status" class="muted" style="margin-top:12px;">Lade Daten…</div>
+
+    <div style="overflow:auto; margin-top:12px;">
+      <table id="tbl" style="display:none;">
+        <thead>
+          <tr>
+            <th style="min-width:220px;">Chart</th>
+            <th>Neueste Version</th>
+            <th>Weitere Versionen</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+(async function () {
+  const INDEX_URL = "https://simovative.github.io/onPremise-Helm/index.yaml";
+  document.getElementById("src").textContent = INDEX_URL;
+
+  const status = (msg, isErr=false) => {
+    const el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = isErr ? "error" : "muted";
+  };
+
+  try {
+    // cache: "no-store" hilft, dass Browser nicht ewig alte YAML cached
+    const res = await fetch(INDEX_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const yamlText = await res.text();
+    const data = jsyaml.load(yamlText);
+
+    const entries = data && data.entries ? data.entries : {};
+    const rows = [];
+
+    for (const [chartName, versions] of Object.entries(entries)) {
+      // versions ist i.d.R. absteigend sortiert; wir sortieren zur Sicherheit nach created/version
+      const sorted = [...versions].sort((a,b) => {
+        const da = Date.parse(a.created || 0) || 0;
+        const db = Date.parse(b.created || 0) || 0;
+        if (db !== da) return db - da;
+        return String(b.version).localeCompare(String(a.version), undefined, {numeric:true});
+      });
+
+      const latest = sorted[0];
+      const others = sorted.slice(1);
+
+      rows.push({
+        chart: chartName,
+        latestVersion: latest?.version || "—",
+        latestAppVersion: latest?.appVersion || "",
+        latestCreated: latest?.created || "",
+        others: others.map(v => ({
+          version: v.version,
+          appVersion: v.appVersion || "",
+          created: v.created || ""
+        }))
+      });
+    }
+
+    // alphabetisch
+    rows.sort((a,b) => a.chart.localeCompare(b.chart));
+
+    const tbody = document.getElementById("tbody");
+
+    function render(filter="") {
+      tbody.innerHTML = "";
+      const f = filter.trim().toLowerCase();
+
+      const filtered = rows.filter(r => {
+        if (!f) return true;
+        if (r.chart.toLowerCase().includes(f)) return true;
+        if (String(r.latestVersion).toLowerCase().includes(f)) return true;
+        return r.others.some(o => String(o.version).toLowerCase().includes(f));
+      });
+
+      for (const r of filtered) {
+        const tr = document.createElement("tr");
+
+        const tdChart = document.createElement("td");
+        tdChart.innerHTML = `<strong>${escapeHtml(r.chart)}</strong>`;
+        tr.appendChild(tdChart);
+
+        const tdLatest = document.createElement("td");
+        const app = r.latestAppVersion ? ` <span class="pill">App: ${escapeHtml(r.latestAppVersion)}</span>` : "";
+        const created = r.latestCreated ? `<div class="muted">${escapeHtml(r.latestCreated)}</div>` : "";
+        tdLatest.innerHTML = `<div><strong>${escapeHtml(r.latestVersion)}</strong>${app}</div>${created}`;
+        tr.appendChild(tdLatest);
+
+        const tdOthers = document.createElement("td");
+        if (!r.others.length) {
+          tdOthers.innerHTML = `<span class="muted">—</span>`;
+        } else {
+          const lines = r.others
+            .slice(0, 30) // nicht endlos
+            .map(o => {
+              const a = o.appVersion ? ` (App: ${escapeHtml(o.appVersion)})` : "";
+              return `<div>${escapeHtml(o.version)}${a}</div>`;
+            })
+            .join("");
+          tdOthers.innerHTML = `
+            <details>
+              <summary>${r.others.length} Version(en) anzeigen</summary>
+              <div style="margin-top:8px;">${lines}</div>
+            </details>`;
+        }
+        tr.appendChild(tdOthers);
+
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById("tbl").style.display = "";
+      status(filtered.length ? `${filtered.length} Chart(s) angezeigt.` : "Keine Treffer.");
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    document.getElementById("asof").textContent = new Date().toLocaleString("de-DE");
+    document.getElementById("q").addEventListener("input", (e) => render(e.target.value));
+
+    render("");
+  } catch (e) {
+    status("Konnte Versionen nicht laden: " + e.message, true);
+  }
+})();
+</script>
+</body>
+</html>
