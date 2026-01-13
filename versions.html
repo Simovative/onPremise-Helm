@@ -8,17 +8,39 @@
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
     h1 { margin: 0 0 8px; }
     .sub { color: #555; margin-bottom: 18px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; max-width: 980px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
-    th { background: #fafafa; position: sticky; top: 0; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f2f2f2; font-size: 12px; }
-    details { margin: 6px 0; }
+
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; max-width: 1100px; }
+    .row { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; justify-content:space-between; }
     .muted { color: #666; font-size: 13px; }
     .error { color: #b00020; }
-    input { width: 100%; max-width: 420px; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; }
+
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f2f2f2; font-size: 12px; }
+    .pill-strong { font-weight: 600; }
+
+    .summary { display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 14px; }
+    .summaryBox {
+      border: 1px solid #eee; border-radius: 12px; padding: 10px 12px; background: #fafafa;
+      min-width: 260px; flex: 1;
+    }
+    .summaryTitle { font-size: 12px; color: #666; margin-bottom: 6px; }
+    .summaryValue { font-size: 14px; font-weight: 650; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { background: #fafafa; position: sticky; top: 0; z-index: 1; }
+
+    input { padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; }
+    #q { width: 100%; max-width: 420px; }
+
+    .miniSearch { width: 100%; max-width: 240px; padding: 8px 10px; border-radius: 10px; border: 1px solid #ddd; }
+    .versionsBox {
+      margin-top: 8px; border: 1px solid #eee; border-radius: 10px; padding: 8px 10px;
+      max-height: 220px; overflow: auto; background: #fff;
+    }
+    .verLine { padding: 4px 0; border-bottom: 1px dashed #f0f0f0; }
+    .verLine:last-child { border-bottom: none; }
+    .verMeta { color:#666; font-size: 12px; margin-left: 6px; }
   </style>
-  <!-- YAML Parser (Client-side). Kein Build nötig. -->
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 </head>
 <body>
@@ -26,24 +48,38 @@
   <div class="sub">Einfacher Überblick für alle – ohne Helm-Kenntnisse.</div>
 
   <div class="card">
-    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
+    <div class="row" style="align-items:center;">
       <div>
         <div class="muted">Quelle: <span class="pill" id="src"></span></div>
         <div class="muted">Stand: <span id="asof">lädt…</span></div>
       </div>
       <div style="min-width:260px; flex:1; max-width:420px;">
-        <input id="q" placeholder="Filtern nach Chart-Name oder Version…" />
+        <input id="q" placeholder="Charts filtern (Name oder Version)…" />
       </div>
     </div>
 
-    <div id="status" class="muted" style="margin-top:12px;">Lade Daten…</div>
+    <!-- Latest Übersicht -->
+    <div class="summary">
+      <div class="summaryBox">
+        <div class="summaryTitle">Latest (stable)</div>
+        <div class="summaryValue" id="latestStable">—</div>
+        <div class="muted" id="latestStableMeta"></div>
+      </div>
+      <div class="summaryBox">
+        <div class="summaryTitle">Latest (any)</div>
+        <div class="summaryValue" id="latestAny">—</div>
+        <div class="muted" id="latestAnyMeta"></div>
+      </div>
+    </div>
+
+    <div id="status" class="muted" style="margin-top:8px;">Lade Daten…</div>
 
     <div style="overflow:auto; margin-top:12px;">
       <table id="tbl" style="display:none;">
         <thead>
           <tr>
             <th style="min-width:220px;">Chart</th>
-            <th>Neueste Version</th>
+            <th style="min-width:260px;">Neueste Version</th>
             <th>Weitere Versionen</th>
           </tr>
         </thead>
@@ -63,43 +99,118 @@
     el.className = isErr ? "error" : "muted";
   };
 
+  const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+
+  // "stable" Erkennung: passt zu typischen Helm/ArtifactHub Konventionen
+  // - annotations.stable: "true"/"1"
+  // - annotations["simovative.com/stable"]: ...
+  // - annotations["artifacthub.io/prerelease"] === "true" => eher NICHT stable
+  // - keywords/tags enthält "stable"
+  function isStable(v) {
+    const ann = v?.annotations || {};
+    const stableKeys = [
+      "stable",
+      "simovative.com/stable",
+      "simovative.io/stable",
+      "chart.stable"
+    ];
+    for (const k of stableKeys) {
+      if (ann[k] != null) {
+        const val = String(ann[k]).toLowerCase();
+        if (val === "true" || val === "1" || val === "yes") return true;
+      }
+    }
+    if (String(ann["artifacthub.io/prerelease"] || "").toLowerCase() === "true") return false;
+
+    const kw = Array.isArray(v?.keywords) ? v.keywords : [];
+    const tg = Array.isArray(v?.tags) ? v.tags : [];
+    const hasStableWord = [...kw, ...tg].some(x => String(x).toLowerCase() === "stable");
+    if (hasStableWord) return true;
+
+    return false;
+  }
+
+  function dateMs(v) {
+    const t = Date.parse(v?.created || "");
+    return Number.isFinite(t) ? t : 0;
+  }
+
   try {
-    // cache: "no-store" hilft, dass Browser nicht ewig alte YAML cached
     const res = await fetch(INDEX_URL, { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const yamlText = await res.text();
     const data = jsyaml.load(yamlText);
-
     const entries = data && data.entries ? data.entries : {};
+
     const rows = [];
+    const allVersionsFlat = []; // für Latest-Auswertung über alles
 
     for (const [chartName, versions] of Object.entries(entries)) {
-      // versions ist i.d.R. absteigend sortiert; wir sortieren zur Sicherheit nach created/version
       const sorted = [...versions].sort((a,b) => {
-        const da = Date.parse(a.created || 0) || 0;
-        const db = Date.parse(b.created || 0) || 0;
+        const db = dateMs(b), da = dateMs(a);
         if (db !== da) return db - da;
         return String(b.version).localeCompare(String(a.version), undefined, {numeric:true});
       });
 
       const latest = sorted[0];
-      const others = sorted.slice(1);
+
+      // Alle Versionen (inkl. latest) in eine Liste für die "pro Zeile" Anzeige
+      const allLines = sorted.map(v => ({
+        version: v.version,
+        appVersion: v.appVersion || "",
+        created: v.created || "",
+        stable: isStable(v)
+      }));
+
+      // Sammeln für globales "Latest"
+      for (const v of sorted) {
+        allVersionsFlat.push({
+          chart: chartName,
+          version: v.version,
+          appVersion: v.appVersion || "",
+          created: v.created || "",
+          stable: isStable(v),
+          ms: dateMs(v)
+        });
+      }
 
       rows.push({
         chart: chartName,
         latestVersion: latest?.version || "—",
         latestAppVersion: latest?.appVersion || "",
         latestCreated: latest?.created || "",
-        others: others.map(v => ({
-          version: v.version,
-          appVersion: v.appVersion || "",
-          created: v.created || ""
-        }))
+        allLines
       });
     }
 
-    // alphabetisch
+    // Alphabetisch nach Chart
     rows.sort((a,b) => a.chart.localeCompare(b.chart));
+
+    // Global: Latest (any) / Latest (stable)
+    const anySorted = [...allVersionsFlat].sort((a,b) => (b.ms - a.ms) || String(b.version).localeCompare(String(a.version), undefined, {numeric:true}));
+    const latestAny = anySorted[0] || null;
+
+    const stableSorted = anySorted.filter(x => x.stable);
+    const latestStable = stableSorted[0] || null;
+
+    function setLatest(elValue, elMeta, item, fallbackText) {
+      if (!item) {
+        document.getElementById(elValue).textContent = fallbackText;
+        document.getElementById(elMeta).textContent = "";
+        return;
+      }
+      document.getElementById(elValue).innerHTML =
+        `<span class="pill pill-strong">${escapeHtml(item.chart)}</span> ${escapeHtml(item.version)}`;
+      const metaParts = [];
+      if (item.appVersion) metaParts.push(`App: ${item.appVersion}`);
+      if (item.created) metaParts.push(item.created);
+      document.getElementById(elMeta).textContent = metaParts.join(" • ");
+    }
+
+    setLatest("latestAny", "latestAnyMeta", latestAny, "—");
+    setLatest("latestStable", "latestStableMeta", latestStable, "Keine stable-Version gefunden");
 
     const tbody = document.getElementById("tbody");
 
@@ -111,49 +222,60 @@
         if (!f) return true;
         if (r.chart.toLowerCase().includes(f)) return true;
         if (String(r.latestVersion).toLowerCase().includes(f)) return true;
-        return r.others.some(o => String(o.version).toLowerCase().includes(f));
+        return r.allLines.some(o => String(o.version).toLowerCase().includes(f));
       });
 
       for (const r of filtered) {
         const tr = document.createElement("tr");
 
+        // Chart
         const tdChart = document.createElement("td");
         tdChart.innerHTML = `<strong>${escapeHtml(r.chart)}</strong>`;
         tr.appendChild(tdChart);
 
+        // Latest
         const tdLatest = document.createElement("td");
         const app = r.latestAppVersion ? ` <span class="pill">App: ${escapeHtml(r.latestAppVersion)}</span>` : "";
         const created = r.latestCreated ? `<div class="muted">${escapeHtml(r.latestCreated)}</div>` : "";
         tdLatest.innerHTML = `<div><strong>${escapeHtml(r.latestVersion)}</strong>${app}</div>${created}`;
         tr.appendChild(tdLatest);
 
+        // Weitere Versionen: Suche + Liste (eine pro Zeile)
         const tdOthers = document.createElement("td");
-        if (!r.others.length) {
-          tdOthers.innerHTML = `<span class="muted">—</span>`;
-        } else {
-          const lines = r.others
-            .slice(0, 30) // nicht endlos
-            .map(o => {
-              const a = o.appVersion ? ` (App: ${escapeHtml(o.appVersion)})` : "";
-              return `<div>${escapeHtml(o.version)}${a}</div>`;
-            })
-            .join("");
-          tdOthers.innerHTML = `
-            <details>
-              <summary>${r.others.length} Version(en) anzeigen</summary>
-              <div style="margin-top:8px;">${lines}</div>
-            </details>`;
-        }
+        tdOthers.innerHTML = `
+          <input class="miniSearch" placeholder="In Versionen suchen…" data-chart="${escapeHtml(r.chart)}" />
+          <div class="versionsBox" data-list="${escapeHtml(r.chart)}"></div>
+        `;
         tr.appendChild(tdOthers);
 
         tbody.appendChild(tr);
+
+        // Liste initial befüllen
+        const listEl = tdOthers.querySelector(`[data-list="${CSS.escape(r.chart)}"]`);
+        const inputEl = tdOthers.querySelector(`input[data-chart="${CSS.escape(r.chart)}"]`);
+
+        function renderVersions(vFilter="") {
+          const vf = vFilter.trim().toLowerCase();
+          const lines = r.allLines.filter(v => {
+            if (!vf) return true;
+            return String(v.version).toLowerCase().includes(vf)
+              || String(v.appVersion).toLowerCase().includes(vf);
+          });
+
+          listEl.innerHTML = lines.map(v => {
+            const stablePill = v.stable ? ` <span class="pill">stable</span>` : "";
+            const appV = v.appVersion ? `<span class="verMeta">App: ${escapeHtml(v.appVersion)}</span>` : "";
+            return `<div class="verLine"><strong>${escapeHtml(v.version)}</strong>${stablePill}${appV}</div>`;
+          }).join("") || `<div class="muted">Keine Treffer.</div>`;
+        }
+
+        inputEl.addEventListener("input", e => renderVersions(e.target.value));
+        renderVersions("");
       }
 
       document.getElementById("tbl").style.display = "";
       status(filtered.length ? `${filtered.length} Chart(s) angezeigt.` : "Keine Treffer.");
     }
-
-    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
     document.getElementById("asof").textContent = new Date().toLocaleString("de-DE");
     document.getElementById("q").addEventListener("input", (e) => render(e.target.value));
