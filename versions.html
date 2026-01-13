@@ -6,33 +6,23 @@
   <title>Helm Repo – Versionen</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
-    h1 { margin: 0 0 8px; }
-    .sub { color: #555; margin-bottom: 18px; }
-
+    h1 { margin: 0 0 6px; }
+    .sub { color: #555; margin-bottom: 14px; }
     .card { border: 1px solid #ddd; border-radius: 14px; padding: 16px; max-width: 900px; }
     .muted { color: #666; font-size: 13px; }
     .error { color: #b00020; }
-
     .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f2f2f2; font-size: 12px; }
     .pill-strong { font-weight: 650; }
-
     .summary { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 14px; }
-    .summaryBox {
-      border: 1px solid #eee; border-radius: 14px; padding: 10px 12px; background: #fafafa;
-      min-width: 260px; flex: 1;
-    }
+    .summaryBox { border: 1px solid #eee; border-radius: 14px; padding: 10px 12px; background: #fafafa; min-width: 260px; flex: 1; }
     .summaryTitle { font-size: 12px; color: #666; margin-bottom: 6px; }
     .summaryValue { font-size: 14px; font-weight: 700; }
-
     input { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid #ddd; max-width: 520px; }
-
-    .versionsBox {
-      margin-top: 10px; border: 1px solid #eee; border-radius: 12px; padding: 8px 10px;
-      max-height: 420px; overflow: auto; background: #fff;
-    }
+    .versionsBox { margin-top: 10px; border: 1px solid #eee; border-radius: 12px; padding: 8px 10px; max-height: 420px; overflow: auto; background: #fff; }
     .verLine { padding: 7px 0; border-bottom: 1px dashed #f0f0f0; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
     .verLine:last-child { border-bottom: none; }
     .verMeta { color:#666; font-size: 12px; }
+    .stamp { margin-top: 10px; color:#777; font-size:12px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 </head>
@@ -63,12 +53,22 @@
       <input id="q" placeholder="In Versionen suchen (z. B. 18.03 oder stable)…" />
       <div class="versionsBox" id="list" style="display:none;"></div>
     </div>
+
+    <!-- Damit du sofort siehst, ob wirklich diese Datei live ist -->
+    <div class="stamp">Seiten-Version: <strong>2026-01-13-a</strong></div>
   </div>
 
 <script>
 (async function () {
-  const INDEX_URL = "https://simovative.github.io/onPremise-Helm/index.yaml";
-  document.getElementById("src").textContent = INDEX_URL;
+  // 1) index.yaml RELATIV laden (funktioniert sauber auf GitHub Pages, egal wie der Pfad genau heißt)
+  // 2) Cache-Buster dran, damit du sofort Änderungen siehst
+  const baseIndex = new URL("index.yaml", window.location.href).toString();
+  const INDEX_URL = baseIndex + (baseIndex.includes("?") ? "&" : "?") + "t=" + Date.now();
+
+  // Nur ein Chart – wir nehmen academyfive, falls vorhanden, sonst das erste
+  const PREFERRED_CHART = "academyfive";
+
+  document.getElementById("src").textContent = baseIndex;
 
   const status = (msg, isErr=false) => {
     const el = document.getElementById("status");
@@ -80,15 +80,16 @@
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
 
+  // Stable: wenn appVersion ODER version "stable" enthält (case-insensitive)
+  function isStable(v) {
+    const av = String(v?.appVersion || "").toLowerCase();
+    const ver = String(v?.version || "").toLowerCase();
+    return av.includes("stable") || ver.includes("stable");
+  }
+
   function dateMs(v) {
     const t = Date.parse(v?.created || "");
     return Number.isFinite(t) ? t : 0;
-  }
-
-  // Stable, wenn appVersion irgendwo "stable" enthält (case-insensitive)
-  function isStable(v) {
-    const av = String(v?.appVersion || "").toLowerCase();
-    return av.includes("stable");
   }
 
   function setLatest(elValue, elMeta, item, fallbackText) {
@@ -97,7 +98,8 @@
       document.getElementById(elMeta).textContent = "";
       return;
     }
-    document.getElementById(elValue).innerHTML = `${escapeHtml(item.version)} ${item.stable ? '<span class="pill pill-strong">stable</span>' : ''}`;
+    document.getElementById(elValue).innerHTML =
+      `${escapeHtml(item.version)} ${item.stable ? '<span class="pill pill-strong">stable</span>' : ''}`;
     const meta = [];
     if (item.appVersion) meta.push(`App: ${item.appVersion}`);
     if (item.created) meta.push(item.created);
@@ -110,21 +112,17 @@
     const yamlText = await res.text();
     const data = jsyaml.load(yamlText);
 
-    const entries = data && data.entries ? data.entries : {};
+    const entries = data?.entries || {};
     const chartNames = Object.keys(entries);
-
     if (!chartNames.length) {
       status("Keine Charts im index.yaml gefunden.", true);
       return;
     }
 
-    // Nur ein Chart anzeigen:
-    // - wenn genau eins vorhanden: nimm das
-    // - sonst: nimm einfach das erste (damit UI trotzdem simpel bleibt)
-    const chartName = chartNames.length === 1 ? chartNames[0] : chartNames[0];
+    const chartName = entries[PREFERRED_CHART] ? PREFERRED_CHART : chartNames[0];
     const versions = entries[chartName] || [];
 
-    // Sortierung: nach created (desc), sonst nach version
+    // Sortierung: primär created desc (wenn vorhanden), sonst lex/numeric auf version
     const sorted = [...versions].sort((a,b) => {
       const db = dateMs(b), da = dateMs(a);
       if (db !== da) return db - da;
@@ -142,12 +140,11 @@
     const latestAny = allLines[0] || null;
     const latestStable = allLines.find(x => x.stable) || null;
 
-    setLatest("latestAny", "latestAnyMeta", latestAny, "—");
-    setLatest("latestStable", "latestStableMeta", latestStable, "Keine stable-Version gefunden");
-
-    // UI
     document.title = `Versionen – ${chartName}`;
     document.querySelector("h1").textContent = `Versionen: ${chartName}`;
+
+    setLatest("latestAny", "latestAnyMeta", latestAny, "—");
+    setLatest("latestStable", "latestStableMeta", latestStable, "Keine stable-Version gefunden");
 
     const listEl = document.getElementById("list");
     const qEl = document.getElementById("q");
