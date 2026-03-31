@@ -27,6 +27,31 @@ spec:
           image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
           imagePullPolicy: Always
           command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php migrate' ]
+          env:
+            - name: A5_RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
+                  key: username
+                  optional: true
+            - name: A5_RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
+                  key: password
+                  optional: true
+            - name: A5_RABBITMQ_N8N_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
+                  key: username
+                  optional: true
+            - name: A5_RABBITMQ_N8N_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
+                  key: password
+                  optional: true
           envFrom:
             - configMapRef:
                 name: migration-academy-configmap

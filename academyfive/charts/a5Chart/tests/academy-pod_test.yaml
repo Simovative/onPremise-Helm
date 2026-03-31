@@ -1,0 +1,38 @@
+# CHART_PATH/tests/academy-pod_test.yaml
+suite: a5Chart - Academy Pod
+templates:
+  - academy-pod.yaml
+  - academy-configmap.yaml # needed for checksum check
+tests:
+  - it: should be a Deployment and match properly
+    template: academy-pod.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - matchRegex:
+          path: metadata.name
+          pattern: academy-deployment
+
+  - it: should set replicas from values
+    template: academy-pod.yaml
+    set:
+      deployment.academyfiveReplicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+# serviceAccountName
+  - it: should set default as serviceAccount name
+    template: academy-pod.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "default"
+  - it: should set serviceAccount name
+    template: academy-pod.yaml
+    set:
+      deployment.serviceAccountName: "my-service-account"
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "my-service-account"

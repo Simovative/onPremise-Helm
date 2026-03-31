@@ -32,6 +32,31 @@ spec:
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
+          env:
+            - name: A5_RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
+                  key: username
+                  optional: true
+            - name: A5_RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
+                  key: password
+                  optional: true
+            - name: A5_RABBITMQ_N8N_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
+                  key: username
+                  optional: true
+            - name: A5_RABBITMQ_N8N_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
+                  key: password
+                  optional: true
           envFrom:
             - configMapRef:
                 name: academy-configmap

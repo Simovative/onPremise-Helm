@@ -18,6 +18,7 @@ envData:
   METRICS_SCRAPER_IP: ""
   TIDEWAYS_CONNECTION: "" #tcp://tideways:9135
   TIDEWAYS_API_KEY: ""
+  A5_RABBITMQ_ENDPOINT_URL: ""
   A5_NESTED_PROXY_COUNT: "1"
   CSP_ENDPOINT_URL: "https://8grl7rscqg.execute-api.eu-central-1.amazonaws.com/CSPViolationReport" #simovative endpoint
   REDIS_SESSION:
@@ -38,6 +39,8 @@ infrastructureData:
   oas_a5_domain: ""
   services_domain: ""
   pdf_service_url: ""
+  rabbitmq_secret_name: "a5-rabbitmq-user-pass"
+  rabbitmq_n8n_secret_name: "a5-rabbitmq-n8n-user-pass"
   session_type: "redis"
   session_cluster: true
   cache_type: "redis"
@@ -48,7 +51,7 @@ migration:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V18.07.8
+  versionTag: V18.08
   serviceAccountName: default
   cpuLimits: 4096m
   cpuRequests: 2048m
