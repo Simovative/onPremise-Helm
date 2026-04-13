@@ -19,6 +19,7 @@ a5Chart:
       ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
       IS_CLUSTER: 1
       AUTH: "no_auth"
+    N8N_URL: ""
   infrastructureData:
     database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<DATABASE_NAME>"
     database_write_location: "mysql://<YOUR_WRITE_USER>:<PASSWORD>@<WRITER_END_POINT>/<DATABASE_NAME>"
@@ -132,6 +133,8 @@ sharedResourcesNginx:
 gotenbergChart:
   enabled: false
 oasChart:
+  enabled: false
+n8nSsoProxyChart:
   enabled: false
 secretChart:
   enabled: true

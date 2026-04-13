@@ -1,0 +1,54 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-sso-proxy-deployment
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: n8n-sso-proxy-app
+  template:
+    metadata:
+      labels:
+        app: n8n-sso-proxy-app
+        image-version: "{{ .Values.deployment.versionTag }}"
+    spec:
+      containers:
+        - name: n8n-sso-proxy
+          image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag }}
+          ports:
+            - containerPort: 3000
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+          env:
+            - name: N8N_UPSTREAM_URL
+              value: {{ .Values.deployment.n8n_url }}
+            - name: N8N_USER_MANAGEMENT_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.n8n_user_management_jwt_secret_name }}
+                  key: password
+            - name: N8N_CSP_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.n8n_csp_cookie_secret_name }}
+                  key: password
+      {{- if .Values.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.deployment.imagePullSecrets }}
+      {{- end }}
+{{- end }}

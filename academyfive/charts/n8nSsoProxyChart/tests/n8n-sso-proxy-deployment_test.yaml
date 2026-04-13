@@ -1,0 +1,63 @@
+suite: n8nSsoProxyChart - Deployment
+templates:
+  - n8n-sso-proxy-deployment.yaml
+tests:
+  - it: should render Deployment manifest with all provided values from values-file
+    set:
+      enabled: true
+      deployment.image: 111111111111.dkr.ecr.eu-central-1.amazonaws.com/n8n-sso-proxy
+      deployment.versionTag: release-2
+      deployment.replicas: 3
+      deployment.imagePullSecrets: "my-registry-secret"
+      deployment.resources:
+        requests:
+          cpu: 500m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+    asserts:
+      - isKind:
+          of: Deployment
+      - matchRegex:
+          path: metadata.name
+          pattern: n8n-sso-proxy-deployment
+      - equal:
+          path: spec.replicas
+          value: 3
+      - matchRegex:
+          path: spec.template.metadata.labels.app
+          pattern: n8n-sso-proxy-app
+      - matchRegex:
+          path: spec.template.spec.containers[0].name
+          pattern: n8n-sso-proxy
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: 111111111111.dkr.ecr.eu-central-1.amazonaws.com/n8n-sso-proxy:release-2
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 500m
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 512Mi
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 1000m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 1Gi
+      - equal:
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: my-registry-secret
+
+  - it: should handle empty resources properly
+    set:
+      enabled: true
+      deployment.resources: {}
+    asserts:
+      - isKind:
+          of: Deployment
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].resources
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].resources

@@ -1,0 +1,42 @@
+enabled: true
+
+secret:
+  # this secret is shared with the a5-pods. do not change
+  n8n_user_management_jwt_secret_name: "n8n-user-management-jwt-secret"
+  n8n_csp_cookie_secret_name: "n8n-csp-cookie-secret"
+
+deployment:
+  replicas: 2
+  # configure image pulling
+  image: <YOUR_IMAGE_LOCATION>
+  versionTag: <YOUR_VERSION>
+  imagePullSecrets: "regcred"
+  # set resources if needed
+  resources: {}
+  #  requests:
+  #    cpu: 1000m
+  #    memory: 500M
+  #  limits:
+  #    cpu: 2000m
+  #    memory: 1G
+  n8n_url: "http://n8n:5678"
+  envData: {}
+
+ingress:
+  hostname: "n8n.university.com"
+
+  #If required provide your own labels and annotations
+  labels: {}
+  #examplelabel: examplevalue
+  annotations: {}
+    #alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    #alb.ingress.kubernetes.io/ssl-redirect: '443'
+    #alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:your-certificate-arn
+    #alb.ingress.kubernetes.io/scheme: internet-facing
+    #alb.ingress.kubernetes.io/target-type: ip
+  tlsSecretName: academyfive.net-tls
+  ingressClassName: nginx
+
+service:
+  type: ClusterIP
+  port: 80

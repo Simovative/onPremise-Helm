@@ -1,0 +1,16 @@
+suite: n8nSsoProxyChart - Service
+templates:
+  - n8n-sso-proxy-service.yaml
+tests:
+  - it: should be a service and match properly
+    set:
+      enabled: true
+    asserts:
+      - isKind:
+          of: Service
+      - matchRegex:
+          path: metadata.name
+          pattern: n8n-sso-proxy
+      - matchRegex:
+          path: spec.selector.app
+          pattern: n8n-sso-proxy-app

@@ -126,3 +126,73 @@ tests:
                 key: password
                 name: "rabbitmq-n8n-secret"
                 optional: true
+
+  - it: should set default secrets N8N OWNER
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_OWNER_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: email
+                name: "n8n-owner-credentials"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_OWNER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "n8n-owner-credentials"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_OWNER_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: apiToken
+                name: "n8n-owner-credentials"
+                optional: true
+  - it: should set N8N-OWNER-Secrets from values-file
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    set:
+      infrastructureData.n8n_owner_credentials_secret_name: "n8n-custom-secret"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_OWNER_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: email
+                name: "n8n-custom-secret"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_OWNER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "n8n-custom-secret"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_OWNER_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: apiToken
+                name: "n8n-custom-secret"
+                optional: true
+

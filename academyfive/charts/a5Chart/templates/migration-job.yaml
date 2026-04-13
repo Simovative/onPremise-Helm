@@ -52,6 +52,24 @@ spec:
                   name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
                   key: password
                   optional: true
+            - name: N8N_OWNER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
+                  key: email
+                  optional: true
+            - name: N8N_OWNER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
+                  key: password
+                  optional: true
+            - name: N8N_OWNER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
+                  key: apiToken
+                  optional: true
           envFrom:
             - configMapRef:
                 name: migration-academy-configmap

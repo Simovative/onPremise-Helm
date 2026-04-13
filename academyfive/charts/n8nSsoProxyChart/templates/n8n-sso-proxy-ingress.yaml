@@ -1,0 +1,43 @@
+{{- if .Values.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-n8n-sso-proxy
+  {{- with .Values.ingress.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  annotations:
+  {{- with .Values.ingress.annotations }}
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+    # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header Ingress-Resource "ingress-n8n-sso-proxy";
+
+    nginx.ingress.kubernetes.io/use-gzip: "true"
+    nginx.ingress.kubernetes.io/gzip-level: "6"
+    nginx.ingress.kubernetes.io/use-http2: "true"
+spec:
+  {{- if .Values.ingress.tlsSecretName }}
+  tls:
+    - hosts:
+        - {{ required "ingress.hostname is required" .Values.ingress.hostname }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+  {{- end }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+    - host: {{ required "ingress.hostname is required" .Values.ingress.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n-sso-proxy
+                port:
+                  number: 80
+
+{{- end }}

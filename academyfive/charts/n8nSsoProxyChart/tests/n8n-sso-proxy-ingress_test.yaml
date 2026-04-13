@@ -1,0 +1,43 @@
+suite: n8nSsoProxyChart - Ingress
+templates:
+  - n8n-sso-proxy-ingress.yaml
+tests:
+  - it: should be an ingress and default values match properly
+    set:
+      enabled: true
+    asserts:
+      - isKind:
+          of: Ingress
+      - matchRegex:
+          path: metadata.name
+          pattern: ingress-n8n-sso-proxy
+      - matchRegex:
+          path: spec.ingressClassName
+          pattern: nginx
+      # tls
+      - exists:
+          path: spec.tls
+      - equal:
+          path: spec.tls[0].hosts
+          value: ["n8n.university.com"]
+      - equal:
+          path: spec.tls[0].secretName
+          value: academyfive.net-tls
+      # rules
+      - exists:
+          path: spec.rules
+      - equal:
+          path: spec.rules[0].host
+          value: n8n.university.com
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
+      - equal:
+          path: spec.rules[0].http.paths[0].pathType
+          value: Prefix
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: n8n-sso-proxy
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.number
+          value: 80
