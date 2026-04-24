@@ -1,0 +1,43 @@
+# CHART_PATH/tests/academy-pod_test.yaml
+# we test that these containers share these characteristics
+suite: a5Chart - Academy Container N8N Sso Proxy Envs
+templates:
+  - academy-pod.yaml
+  - cron-pod.yaml
+  - migration-job.yaml
+  - academy-configmap.yaml # needed for checksum check
+  - cron-configmap.yaml # needed for checksum check
+tests:
+# secret tests
+  - it: should set default secret_names for N8N-SSO-Proxy-Secrets
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_USER_MANAGEMENT_JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "n8n-user-management-jwt-secret"
+                optional: true
+  - it: should set N8N-SSO-Proxy-Secret-names from values-file
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    set:
+      infrastructureData.n8n_user_management_jwt_secret_name: "custom-n8n-user-management-jwt-secret"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: N8N_USER_MANAGEMENT_JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "custom-n8n-user-management-jwt-secret"
+                optional: true

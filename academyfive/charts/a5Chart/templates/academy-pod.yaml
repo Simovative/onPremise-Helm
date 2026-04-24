@@ -75,6 +75,12 @@ spec:
                   name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
                   key: apiToken
                   optional: true
+            - name: N8N_USER_MANAGEMENT_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.infrastructureData.n8n_user_management_jwt_secret_name }}
+                  key: password
+                  optional: true
           envFrom:
             - configMapRef:
                 name: academy-configmap

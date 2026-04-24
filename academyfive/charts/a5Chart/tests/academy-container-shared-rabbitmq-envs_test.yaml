@@ -1,0 +1,127 @@
+# CHART_PATH/tests/academy-pod_test.yaml
+# we test that these containers share these characteristics
+suite: a5Chart - Academy Container RabbitMQ Envs
+templates:
+  - academy-pod.yaml
+  - cron-pod.yaml
+  - migration-job.yaml
+  - academy-configmap.yaml # needed for checksum check
+  - cron-configmap.yaml # needed for checksum check
+tests:
+  - it: cron-pod and academy-pod should be deployments
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+
+# serviceAccountName
+  - it: should set default as serviceAccount name
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "default"
+  - it: should set serviceAccount name
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    set:
+      deployment.serviceAccountName: "my-service-account"
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "my-service-account"
+
+  - it: should set default secrets RABBITMQ-Secret names
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "a5-rabbitmq-user-pass"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "a5-rabbitmq-user-pass"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_N8N_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "a5-rabbitmq-n8n-user-pass"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_N8N_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "a5-rabbitmq-n8n-user-pass"
+                optional: true
+  - it: should set RABBITMQ-Secrets from values-file
+    templates:
+      - academy-pod.yaml
+      - cron-pod.yaml
+      - migration-job.yaml
+    set:
+      infrastructureData.rabbitmq_secret_name: "rabbitmq-secret"
+      infrastructureData.rabbitmq_n8n_secret_name: "rabbitmq-n8n-secret"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "rabbitmq-secret"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "rabbitmq-secret"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_N8N_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "rabbitmq-n8n-secret"
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: A5_RABBITMQ_N8N_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "rabbitmq-n8n-secret"
+                optional: true
