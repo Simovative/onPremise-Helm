@@ -1,0 +1,9 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ required "nginxControllerConfig.configMap.name is required" .Values.configMap.name }}
+  namespace: {{ required "nginxControllerConfig.configMap.namespace is required" .Values.configMap.namespace }}
+data:
+  {{- toYaml .Values.configMap.data | nindent 2 }}
+{{- end }}

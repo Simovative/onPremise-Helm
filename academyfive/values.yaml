@@ -5,6 +5,21 @@
 global:
   domain: "a5.university.com"
   hosts: "*.university.com"
+  # Annotation style emitted on all Ingress resources.
+  #   "nginx-inc"     (default) — emit only F5/NGINX Inc. annotations (nginx.org/*)
+  #   "ingress-nginx" — emit only legacy kubernetes/ingress-nginx annotations
+  #   "both"          — emit both sets (cutover mode: lets you switch the
+  #                     ingressClassName between an ingress-nginx and an F5
+  #                     NGINX controller without re-templating)
+  ingressAnnotationStyle: "nginx-inc"
+
+# Opt-in: have this chart manage the NGINX Ingress Controller's ConfigMap
+# instead of applying nginx-configmap/nginx-configmap.yaml manually.
+# Disabled by default to avoid clashing with existing manual setups or with
+# customers running a shared/multi-tenant controller. See
+# academyfive/charts/nginxControllerConfig/values.yaml for the data block.
+nginxControllerConfig:
+  enabled: false
 a5Chart:
   enabled: true
   envData:

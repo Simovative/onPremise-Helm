@@ -1,23 +1,37 @@
 ---
+# ConfigMap for the F5/NGINX Inc. Kubernetes Ingress Controller
+# (nginx/kubernetes-ingress). Apply this only if you are NOT using
+# academyfive's built-in nginxControllerConfig subchart (which renders the
+# same content as a managed Helm resource).
+#
+# Adjust metadata.name and metadata.namespace to match the running
+# controller's -nginx-configmaps flag.
+#
+# Reference:
+#   https://docs.nginx.com/nginx-ingress-controller/configuration/global-configuration/configmap-resource/
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ingress-nginx-controller
+  name: nginx-ingress
+  namespace: nginx-ingress
 data:
-  allow-snippet-annotations: "true"
-  annotations-risk-level: "Critical"
-  http-snippet: |
-      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-      
-      log_format upstream_time '$remote_addr - $remote_user [$time_local] ' '"$request" $status $body_bytes_sent ' '"$http_referer" "$http_user_agent"' ' rt="$request_time"|"$upstream_connect_time"|"$upstream_header_time"|"$upstream_response_time"';
-      
-      
-      access_log  /var/log/nginx/access.log  main;
+  http2: "true"
+  keepalive-timeout: "5s"
+  keepalive-requests: "10000"
+  http-snippets: |
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                     '$status $body_bytes_sent "$http_referer" '
+                     '"$http_user_agent" "$http_x_forwarded_for"';
 
-      sendfile        on;
+    log_format upstream_time '$remote_addr - $remote_user [$time_local] ' '"$request" $status $body_bytes_sent ' '"$http_referer" "$http_user_agent"' ' rt="$request_time"|"$upstream_connect_time"|"$upstream_header_time"|"$upstream_response_time"';
 
-      proxy_cache_path /tmp/nginx-cache  levels=1:2    keys_zone=nginxproxycache:10m    inactive=24h  max_size=1g;
-      proxy_store_access user:rw group:rw all:r;
-      proxy_hide_header Upgrade;
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+
+    gzip on;
+    gzip_comp_level 6;
+
+    proxy_cache_path /tmp/nginx-cache  levels=1:2    keys_zone=nginxproxycache:10m    inactive=24h  max_size=1g;
+    proxy_store_access user:rw group:rw all:r;
+    proxy_hide_header Upgrade;

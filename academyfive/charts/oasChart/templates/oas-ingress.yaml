@@ -1,3 +1,6 @@
+{{- $style := .Values.global.ingressAnnotationStyle | default "nginx-inc" -}}
+{{- $emitF5 := or (eq $style "nginx-inc") (eq $style "both") -}}
+{{- $emitLegacy := or (eq $style "ingress-nginx") (eq $style "both") -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -12,13 +15,19 @@ metadata:
     {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
-    # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
+  {{- if $emitF5 }}
+    # F5/NGINX Inc. Ingress Controller annotations (nginx.org/*)
+    nginx.org/location-snippets: |
+      add_header Ingress-Resource "ingress-oas";
+  {{- end }}
+  {{- if $emitLegacy }}
+    # Legacy kubernetes/ingress-nginx annotations (EOL March 2026, kept for cutover)
     nginx.ingress.kubernetes.io/configuration-snippet: |
       add_header Ingress-Resource "ingress-oas";
-
     nginx.ingress.kubernetes.io/use-gzip: "true"
     nginx.ingress.kubernetes.io/gzip-level: "6"
     nginx.ingress.kubernetes.io/use-http2: "true"
+  {{- end }}
 spec:
   {{- if .Values.ingress.tlsSecretName }}
   tls:

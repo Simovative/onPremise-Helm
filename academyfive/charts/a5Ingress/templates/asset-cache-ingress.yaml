@@ -1,4 +1,7 @@
 {{- if .Values.assets.enabled -}}
+{{- $style := .Values.global.ingressAnnotationStyle | default "nginx-inc" -}}
+{{- $emitF5 := or (eq $style "nginx-inc") (eq $style "both") -}}
+{{- $emitLegacy := or (eq $style "ingress-nginx") (eq $style "both") -}}
 # caches static files and assets in order to reduce load on a5-containers
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -14,16 +17,55 @@ metadata:
     {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
+  {{- if $emitF5 }}
+    # F5/NGINX Inc. Ingress Controller annotations (nginx.org/*)
+    # https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
+    nginx.org/path-regex: "case_sensitive"
+    nginx.org/proxy-buffering: {{ quote .Values.assets.proxyBuffering }}
+    nginx.org/client-max-body-size: {{ quote .Values.assets.proxyBodySize }}
+    nginx.org/proxy-buffer-size: {{ quote .Values.assets.proxyBufferSize }}
+    nginx.org/proxy-buffers: {{ printf "%s %s" .Values.assets.proxyBufferNumber .Values.assets.proxyBufferSize | quote }}
+    nginx.org/proxy-next-upstream: "error timeout http_502"
+    nginx.org/proxy-connect-timeout: {{ quote .Values.assets.proxyConnectTimeout }}
+    nginx.org/proxy-read-timeout: {{ quote .Values.assets.proxyReadTimeout }}
+    nginx.org/proxy-send-timeout: {{ quote .Values.assets.proxySendTimeout }}
+    # per-Ingress directives that have no nginx.org/* annotation
+    nginx.org/server-snippets: |
+      client_body_buffer_size {{ .Values.assets.clientBodyBufferSize }};
+      client_body_timeout 36000s;
+      client_header_buffer_size {{ .Values.assets.clientHeaderBufferSize }};
+      client_header_timeout 36000s;
+      large_client_header_buffers {{ .Values.assets.largeClientHeaderBuffers }};
+      keepalive_timeout 5s;
+      keepalive_requests 10000;
+    nginx.org/location-snippets: |
+      proxy_cache nginxproxycache;
+      proxy_cache_valid 200 1d;
+      proxy_cache_use_stale error timeout updating http_404 http_500 http_502 http_503 http_504;
+      expires 30d;
+
+      add_header Cache-Control "public, no-transform";
+      add_header X-Cache-Status $upstream_cache_status;
+      add_header Ingress-Resource "ingress-academy-assets";
+      proxy_cache_key $scheme://$host$uri$is_args$query_string;
+      {{- if eq (.Values.assets.enableCors | toString) "true" }}
+
+      add_header Access-Control-Allow-Origin {{ quote .Values.assets.corsAllowOrigin }} always;
+      add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,Range" always;
+      {{- end }}
+  {{- end }}
+  {{- if $emitLegacy }}
+    # Legacy kubernetes/ingress-nginx annotations (EOL March 2026, kept for cutover)
     # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/proxy-buffering: {{ quote .Values.assets.proxyBuffering }}
-    # proxy-body-size is client_max_body_size
     nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.assets.proxyBodySize }}
     nginx.ingress.kubernetes.io/client-body-buffer-size: {{ .Values.assets.clientBodyBufferSize }}
     nginx.ingress.kubernetes.io/client-body-timeout: "36000"
     nginx.ingress.kubernetes.io/large-client-header-buffers: {{ .Values.assets.largeClientHeaderBuffers }}
     nginx.ingress.kubernetes.io/client-header-buffer-size: {{ .Values.assets.clientHeaderBufferSize }}
-    nginx.ingress.kubernetes.io/proxy-buffer-number:  {{ quote .Values.assets.proxyBufferNumber }}
+    nginx.ingress.kubernetes.io/proxy-buffer-number: {{ quote .Values.assets.proxyBufferNumber }}
     nginx.ingress.kubernetes.io/proxy-buffer-size: {{ .Values.assets.proxyBufferSize }}
     nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_502"
     nginx.ingress.kubernetes.io/client-header-timeout: "36000"
@@ -41,7 +83,6 @@ metadata:
       add_header Cache-Control "public, no-transform";
       add_header X-Cache-Status $upstream_cache_status;
       add_header Ingress-Resource "ingress-academy-assets";
-      #proxy_cache_bypass $http_x_purge;
       proxy_cache_key $scheme://$host$uri$is_args$query_string;
 
     nginx.ingress.kubernetes.io/keep-alive: "5"
@@ -49,6 +90,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-gzip: "true"
     nginx.ingress.kubernetes.io/gzip-level: "6"
     nginx.ingress.kubernetes.io/use-http2: "true"
+  {{- end }}
 
 spec:
   {{- if .Values.assets.tlsSecretName }}
@@ -61,9 +103,9 @@ spec:
     - host: {{ .Values.assets.hostname | default .Values.global.domain }}
       http:
         paths:
-          # ingress-nginx uses re2-regex-syntax
-          # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
-          # https://github.com/google/re2/wiki/Syntax
+          # PCRE / re2-compatible regex paths (matched as regex because
+          # pathType is ImplementationSpecific; both ingress-nginx and the F5
+          # NGINX controller with nginx.org/path-regex treat these as regex)
           - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
             pathType: ImplementationSpecific
             backend:
@@ -82,9 +124,6 @@ spec:
     - host: {{ .Values.global.olddomain }}
       http:
         paths:
-          # ingress-nginx uses re2-regex-syntax
-          # https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/
-          # https://github.com/google/re2/wiki/Syntax
           - path: /.*\.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|js.map)
             pathType: ImplementationSpecific
             backend:
