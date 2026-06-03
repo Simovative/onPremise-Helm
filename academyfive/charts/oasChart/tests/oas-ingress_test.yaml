@@ -47,3 +47,24 @@ tests:
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.port.number
           value: 80
+
+  - it: should have ingress-nginx annotations with default values
+    set:
+      enabled: true
+    asserts:
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/use-gzip"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/gzip-level"]
+          value: "6"
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/use-http2"]
+          value: "true"
+
+  - it: should have server-snippets annotation for f5-nginx-ingress
+    set:
+      enabled: true
+    asserts:
+      - exists:
+          path: metadata.annotations["nginx.org/server-snippets"]

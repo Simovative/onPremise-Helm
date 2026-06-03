@@ -1,6 +1,6 @@
-suite: a5ingress - asset cache ingress
+suite: casIngress - cas Ingress
 templates:
-  - asset-cache-ingress.yaml
+  - cas-ingress.yaml
 tests:
   - it: should render an Ingress with correct name and ingressClassName
     asserts:
@@ -8,32 +8,12 @@ tests:
           of: Ingress
       - equal:
           path: metadata.name
-          value: ingress-academy-assets
+          value: ingress-cas
       - equal:
           path: spec.ingressClassName
           value: nginx
 
-  - it: should prefer assets.hostname over global.domain for the rule host
-    set:
-      assets.hostname: asset-cache.university.com
-      global.domain: example.university.com
-    asserts:
-      - equal:
-          path: spec.rules[0].host
-          value: asset-cache.university.com
-
-  - it: should use global.domain when assets.hostname is empty
-    set:
-      assets.hostname: ""
-      global.domain: example.university.com
-    asserts:
-      - equal:
-          path: spec.rules[0].host
-          value: example.university.com
-
-  - it: should have TLS with correct host and secretName
-    set:
-      global.domain: example.university.com
+  - it: should have TLS with correct hosts and secretName
     asserts:
       - exists:
           path: spec.tls
@@ -43,51 +23,35 @@ tests:
       - equal:
           path: spec.tls[0].hosts
           value:
-            - example.university.com
+            - application.university.com
+            - community.university.com
+            - pwa.university.com
 
-  - it: should prefer assets.hostname over global.domain for TLS host
-    set:
-      assets.hostname: asset-cache.university.com
-      global.domain: example.university.com
+  - it: should render rules for all casHosts
     asserts:
+      - exists:
+          path: spec.rules
       - equal:
-          path: spec.tls[0].hosts
-          value:
-            - asset-cache.university.com
-
-  - it: should render olddomain rule when global.olddomain is set
-    set:
-      global.domain: example.university.com
-      global.olddomain: old-example.university.com
-    asserts:
+          path: spec.rules[0].host
+          value: application.university.com
       - equal:
           path: spec.rules[1].host
-          value: old-example.university.com
+          value: community.university.com
+      - equal:
+          path: spec.rules[2].host
+          value: pwa.university.com
 
-  - it: should omit TLS when tlsSecretName is empty
-    set:
-      assets.tlsSecretName: ""
+  - it: should route all hosts to service cas on port 80 with path /
     asserts:
-      - notExists:
-          path: spec.tls
-
-  - it: should not render when assets.enabled is false
-    set:
-      assets.enabled: false
-    asserts:
-      - hasDocuments:
-          count: 0
-
-  - it: should route to service academy on port 80 with asset path patterns
-    set:
-      global.domain: example.university.com
-    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
       - equal:
           path: spec.rules[0].http.paths[0].pathType
-          value: ImplementationSpecific
+          value: Prefix
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.name
-          value: academy
+          value: cas
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.port.number
           value: 80
@@ -99,16 +63,16 @@ tests:
           value: 100M
       - equal:
           path: metadata.annotations["nginx.ingress.kubernetes.io/proxy-body-size"]
-          value: 100M
-      - equal:
-          path: metadata.annotations["nginx.ingress.kubernetes.io/proxy-connect-timeout"]
-          value: "75"
+          value: 500M
       - equal:
           path: metadata.annotations["nginx.ingress.kubernetes.io/proxy-read-timeout"]
-          value: "36000"
+          value: "600"
       - equal:
           path: metadata.annotations["nginx.ingress.kubernetes.io/proxy-send-timeout"]
-          value: "36000"
+          value: "600"
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/client-body-timeout"]
+          value: "3000"
       - equal:
           path: metadata.annotations["nginx.ingress.kubernetes.io/use-gzip"]
           value: "true"
@@ -119,40 +83,36 @@ tests:
           path: metadata.annotations["nginx.ingress.kubernetes.io/use-http2"]
           value: "true"
 
-  - it: should have f5-ingress-nginx (nginx.org) annotations with default values
+  - it: should have f5-nginx-ingress (nginx.org) annotations with default values
     asserts:
       - equal:
           path: metadata.annotations["nginx.org/client-body-buffer-size"]
           value: 100M
       - equal:
           path: metadata.annotations["nginx.org/client-max-body-size"]
-          value: 100M
-      - equal:
-          path: metadata.annotations["nginx.org/proxy-connect-timeout"]
-          value: "75"
+          value: 500M
       - equal:
           path: metadata.annotations["nginx.org/proxy-read-timeout"]
-          value: "36000s"
+          value: 600s
       - equal:
           path: metadata.annotations["nginx.org/proxy-send-timeout"]
-          value: "36000s"
-      - equal:
-          path: metadata.annotations["nginx.org/proxy-buffering"]
-          value: "true"
+          value: 600s
 
-  - it: should have server-snippets annotation for f5-ingress-nginx
+  - it: should have server-snippets annotation for f5-nginx-ingress
     asserts:
       - exists:
           path: metadata.annotations["nginx.org/server-snippets"]
 
-  - it: should have location-snippets annotation for f5-ingress-nginx
+  - it: should omit TLS when tlsSecretName is empty
+    set:
+      ingress.tlsSecretName: ""
     asserts:
-      - exists:
-          path: metadata.annotations["nginx.org/location-snippets"]
+      - notExists:
+          path: spec.tls
 
   - it: should use custom ingressClassName when set
     set:
-      assets.ingressClassName: f5-nginx
+      ingress.ingressClassName: f5-nginx
     asserts:
       - equal:
           path: spec.ingressClassName
@@ -160,22 +120,35 @@ tests:
 
   - it: should apply custom labels when provided
     set:
-      assets.labels:
-        app: academy-assets
+      ingress.labels:
+        app: cas
         environment: production
     asserts:
       - equal:
           path: metadata.labels.app
-          value: academy-assets
+          value: cas
       - equal:
           path: metadata.labels.environment
           value: production
 
   - it: should apply custom annotations when provided
     set:
-      assets.annotations:
+      ingress.annotations:
         custom.io/annotation: "test-value"
     asserts:
       - equal:
           path: metadata.annotations["custom.io/annotation"]
           value: test-value
+
+  - it: should render only the specified casHosts when overridden
+    set:
+      casHosts:
+        - name: my-cas.example.com
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: my-cas.example.com
+      - equal:
+          path: spec.tls[0].hosts
+          value:
+            - my-cas.example.com

@@ -12,6 +12,7 @@ metadata:
     {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
+    # ingress-nginx (kubernetes/ingress-nginx) — annotations (will be removed in future)
     # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
     nginx.ingress.kubernetes.io/configuration-snippet: |
       add_header Ingress-Resource "ingress-oas";
@@ -19,6 +20,12 @@ metadata:
     nginx.ingress.kubernetes.io/use-gzip: "true"
     nginx.ingress.kubernetes.io/gzip-level: "6"
     nginx.ingress.kubernetes.io/use-http2: "true"
+
+    # f5-ingress-nginx (nginx.org) — annotations for migration
+    # docs: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
+    nginx.org/server-snippets: |
+      gzip on;
+      gzip_comp_level 6;
 spec:
   {{- if .Values.ingress.tlsSecretName }}
   tls:

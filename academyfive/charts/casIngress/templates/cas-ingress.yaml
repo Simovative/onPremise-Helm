@@ -12,17 +12,19 @@ metadata:
     {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
+
+    # ingress-nginx (kubernetes/ingress-nginx) — annotations (will be removed in future)
     # docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#client-header-buffer-size
     nginx.ingress.kubernetes.io/client-body-buffer-size: {{ .Values.ingress.clientBodyBufferSize }}
     # proxy-body-size is client_max_body_size
     nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.ingress.proxyBodySize }}
     nginx.ingress.kubernetes.io/client-body-timeout: "3000"
-    nginx.ingress.kubernetes.io/large-client-header-buffers: "2 1k"
     nginx.ingress.kubernetes.io/client-header-buffer-size: "2k"
     nginx.ingress.kubernetes.io/client-header-timeout: "3000"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ quote .Values.ingress.proxyConnectTimeout }}
     nginx.ingress.kubernetes.io/proxy-read-timeout: {{ quote .Values.ingress.proxyReadTimeout }}
     nginx.ingress.kubernetes.io/proxy-send-timeout: {{ quote .Values.ingress.proxySendTimeout }}
+
     nginx.ingress.kubernetes.io/configuration-snippet: |
       add_header Ingress-Resource "ingress-cas";
 
@@ -31,11 +33,29 @@ metadata:
     nginx.ingress.kubernetes.io/use-gzip: "true"
     nginx.ingress.kubernetes.io/gzip-level: "6"
     nginx.ingress.kubernetes.io/use-http2: "true"
+
+    # f5-ingress-nginx (nginx.org) — annotations for migration
+    # docs: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
+    nginx.org/client-body-buffer-size: {{ .Values.ingress.clientBodyBufferSize }}
+    nginx.org/client-max-body-size: {{ .Values.ingress.proxyBodySize }}
+    nginx.org/proxy-read-timeout: {{ printf "%ss" (.Values.ingress.proxyReadTimeout | toString) | quote }}
+    nginx.org/proxy-send-timeout: {{ printf "%ss" (.Values.ingress.proxySendTimeout | toString) | quote }}
+
+    nginx.org/server-snippets: |
+      client_body_timeout 3000s;
+      client_header_timeout 3000s;
+      client_header_buffer_size 2k;
+      keepalive_timeout 5s;
+      keepalive_requests 10000;
+      gzip on;
+      gzip_comp_level 6;
 spec:
   {{- if .Values.ingress.tlsSecretName }}
   tls:
     - hosts:
-        - {{ quote .Values.global.hosts }}
+      {{- range $casHosts := .Values.casHosts }}
+        - {{ $casHosts.name }}
+      {{- end }}
       secretName: {{ .Values.ingress.tlsSecretName }}
   {{- end }}
   rules:
