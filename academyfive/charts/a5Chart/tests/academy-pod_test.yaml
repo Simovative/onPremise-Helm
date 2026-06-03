@@ -36,3 +36,62 @@ tests:
       - equal:
           path: spec.template.spec.serviceAccountName
           value: "my-service-account"
+  - it: should mount oas-files-volume when OAS_FILE_STORAGE_TYPE is "file"
+    template: academy-pod.yaml
+    set:
+      envData:
+        OAS_FILE_STORAGE_TYPE: "file"
+        OAS_FILE_STORAGE_LOCATION: "/mnt/oas-files"
+      infrastructureData:
+        oas_file_storage_volume_claim_name: "oas-file-storage-volume"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: oas-files-volume
+            mountPath: "/mnt/oas-files"
+
+  - it: should mount oas-files-volume at correct path
+    template: academy-pod.yaml
+    set:
+      envData:
+        OAS_FILE_STORAGE_TYPE: "file"
+        OAS_FILE_STORAGE_LOCATION: "/custom/oas/path"
+      infrastructureData:
+        oas_file_storage_volume_claim_name: "oas-pvc"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: oas-files-volume
+            mountPath: "/custom/oas/path"
+
+  - it: should use correct PVC claim name for oas-files-volume
+    template: academy-pod.yaml
+    set:
+      envData:
+        OAS_FILE_STORAGE_TYPE: "file"
+        OAS_FILE_STORAGE_LOCATION: "/mnt/oas-files"
+      infrastructureData:
+        oas_file_storage_volume_claim_name: "my-custom-oas-pvc"
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: oas-files-volume
+            persistentVolumeClaim:
+              claimName: "my-custom-oas-pvc"
+
+  - it: should NOT mount oas-files-volume when storage type is s3
+    template: academy-pod.yaml
+    set:
+      envData:
+        OAS_FILE_STORAGE_TYPE: "s3"
+        OAS_FILE_STORAGE_LOCATION: "/mnt/oas-files"
+      infrastructureData:
+        oas_file_storage_volume_claim_name: "oas-file-storage-volume"
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: oas-files-volume

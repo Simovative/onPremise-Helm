@@ -41,3 +41,12 @@ data:
   {{- end }}
   A5_RABBITMQ_ENDPOINT_URL: {{ .Values.envData.A5_RABBITMQ_ENDPOINT_URL }}
   N8N_URL: {{ .Values.envData.N8N_URL }}
+  {{- if not (eq .Values.envData.OAS_FILE_STORAGE_TYPE "") }}
+  OAS_FILE_STORAGE_TYPE: {{ .Values.envData.OAS_FILE_STORAGE_TYPE }}
+  {{- end }}
+  {{- if not (eq .Values.envData.OAS_FILE_STORAGE_LOCATION "") }}
+  OAS_FILE_STORAGE_LOCATION: {{ .Values.envData.OAS_FILE_STORAGE_LOCATION }}
+  {{- end }}
+  {{- if not (eq .Values.envData.OAS_BUCKET_NAME "") }}
+  OAS_BUCKET_NAME: {{ .Values.envData.OAS_BUCKET_NAME }}
+  {{- end }}

@@ -99,6 +99,11 @@ spec:
             - name: cas-files-volume
               mountPath: {{ .Values.envData.CAS_FILE_STORAGE_LOCATION }}
             {{- end }}
+            # oas file_storage mount
+            {{- if (eq "file" .Values.envData.OAS_FILE_STORAGE_TYPE) }}
+            - name: oas-files-volume
+              mountPath: {{ required "OAS_FILE_STORAGE_LOCATION must be set when OAS_FILE_STORAGE_TYPE is 'file'" .Values.envData.OAS_FILE_STORAGE_LOCATION }}
+            {{- end }}
           resources:
             limits:
               memory: {{ .Values.deployment.memoryLimits }}
@@ -174,4 +179,9 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.infrastructureData.cas_file_storage_volume_claim_name }}
         {{- end }}
+        {{- end }}
+        {{- if (eq "file" .Values.envData.OAS_FILE_STORAGE_TYPE) }}
+        - name: oas-files-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.infrastructureData.oas_file_storage_volume_claim_name }}
         {{- end }}

@@ -20,7 +20,7 @@ envData:
   TIDEWAYS_API_KEY: ""
   A5_RABBITMQ_ENDPOINT_URL: ""
   A5_NESTED_PROXY_COUNT: "1"
-  CSP_ENDPOINT_URL: "https://8grl7rscqg.execute-api.eu-central-1.amazonaws.com/CSPViolationReport" #simovative endpoint
+  CSP_ENDPOINT_URL: ""
   REDIS_SESSION:
     ENDPOINT: "tcp://<YOUR_REDIS_CLUSTER>"
     IS_CLUSTER: 1
@@ -30,12 +30,16 @@ envData:
     IS_CLUSTER: 1
     AUTH: "no_auth"
   N8N_URL: ""
+  OAS_FILE_STORAGE_TYPE: ""
+  OAS_FILE_STORAGE_LOCATION: ""
+  OAS_BUCKET_NAME: ""
 infrastructureData:
   database_type: "mysql"
   database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<databaseName>"
   database_write_location: "mysql://<YOUR_WRITE_USER>:<PASSWORD>@<WRITER_END_POINT>/<DATABASE_NAME>"
   file_storage_type: "s3"
   cas_file_storage_volume_claim_name: "cas-file-storage-volume"
+  oas_file_storage_volume_claim_name: "oas-file-storage-volume"
   a5_file_storage_location: ""
   oas_a5_domain: ""
   services_domain: ""
@@ -54,7 +58,7 @@ migration:
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V18.09.16
+  versionTag: V18.09.18
   serviceAccountName: default
   cpuLimits: 4096m
   cpuRequests: 2048m
