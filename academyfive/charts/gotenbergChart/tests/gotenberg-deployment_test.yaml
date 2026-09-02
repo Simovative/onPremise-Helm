@@ -6,7 +6,6 @@ tests:
     set:
       enabled: true
       deployment.image: gotenberg/gotenberg
-      deployment.versionTag: 8.13
       deployment.replicas: 3
       deployment.imagePullSecrets: "my-registry-secret"
       deployment.resources:
@@ -36,7 +35,7 @@ tests:
           pattern: gotenberg
       - matchRegex:
           path: spec.template.spec.containers[0].image
-          pattern: gotenberg/gotenberg:8.13
+          pattern: gotenberg/gotenberg:8.36
       - equal:
           path: spec.template.spec.containers[0].resources.requests.cpu
           value: 500m
