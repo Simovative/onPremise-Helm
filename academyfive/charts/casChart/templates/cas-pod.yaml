@@ -31,6 +31,11 @@ spec:
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
+          {{- $secretEnv := include "casChart.externalSecretEnv" . }}
+          {{- if $secretEnv }}
+          env:
+          {{- $secretEnv | nindent 12 }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: cas-configmap
@@ -63,12 +68,14 @@ spec:
             requests:
               cpu: {{ .Values.deployment.casPhpFpmLogs.cpuRequests }}
               memory: {{ .Values.deployment.casPhpFpmLogs.memoryRequests }}
+      {{- if .Values.deployment.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+        - name: {{ .Values.deployment.imagePullSecrets }}
+      {{- end }}
       volumes:
         - name: secret-volume
           secret:
-            secretName: cas-a5-api-shared-secret
+            secretName: {{ .Values.secret.cas_a5_api_secret_name }}
         - name: cas-logs-volume
         {{- if .Values.logging.usePersistentVolume }}
           persistentVolumeClaim:

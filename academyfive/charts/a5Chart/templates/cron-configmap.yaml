@@ -11,7 +11,7 @@ data:
   S3_REGION: {{ .Values.envData.S3_REGION }}
   IS_CRON_SERVICE: "1"
   A5_FILE_STORAGE_TYPE: {{ quote .Values.infrastructureData.file_storage_type }}
-  {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "" ) }}
+  {{- if and (not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "" )) (not .Values.infrastructureData.filestorage_endpoint_url_secret_name) }}
   AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
   {{- end }}
   {{- if not (eq .Values.envData.CAS_FILE_STORAGE_LOCATION "") }}

@@ -4,7 +4,7 @@ deployment:
   replicas: 2
   # configure image pulling
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: release-301
+  versionTag: release-302
   imagePullSecrets: "regcred"
   # set resources if needed
   resources: {}
@@ -51,3 +51,12 @@ ingress:
 service:
   type: ClusterIP
   port: 80
+
+# Names of pre-existing Secrets whose keys are injected as environment variables.
+secret:
+  # The S3 endpoint URL typically embeds credentials. Named here, rendered as a secretKeyRef -
+  # the chart picks the variable name, you pick the Secret and the key. Setting it drops the
+  # plain OAS_S3_ENDPOINT_URL from deployment.envData, so the two cannot disagree.
+  # A missing Secret or key stops the Pod from starting; that is deliberate.
+  s3_endpoint_url_secret_name: ""
+  s3_endpoint_url_secret_key: ""

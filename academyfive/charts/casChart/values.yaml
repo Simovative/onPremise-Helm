@@ -5,6 +5,22 @@
 global:
   domain: "a5.university.com"
 
+secret:
+  # must match a5Chart, and secretChart while it creates the Secret
+  cas_a5_api_secret_name: "cas-a5-api-shared-secret"
+  # Credentials that reach the application as environment variables. Named here, rendered as a
+  # secretKeyRef - the chart picks the variable name, you pick the Secret and the key, so an
+  # existing Secret works as it is. Setting one drops the plain value from the ConfigMap.
+  # A missing Secret or key stops the Pod from starting; that is deliberate.
+  redis_session_auth_secret_name: ""
+  redis_session_auth_secret_key: ""
+  redis_cache_auth_secret_name: ""
+  redis_cache_auth_secret_key: ""
+  ca_cert_value_secret_name: ""
+  ca_cert_value_secret_key: ""
+  filestorage_endpoint_url_secret_name: ""
+  filestorage_endpoint_url_secret_key: ""
+
 envData:
   CAS_A5_API_SECRET_LOCATION: "/mnt/shared-secret-volume/sharedSecret"
   CAS_BUCKET_NAME: "casbucket"
@@ -26,8 +42,9 @@ envData:
 deployment:
   replicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: release-B773
+  versionTag: release-B781
   serviceAccountName: default
+  imagePullSecrets: "regcred"
   cpuLimits: 2000m
   cpuRequests: 1000m
   memoryLimits: 2G
@@ -74,3 +91,4 @@ autoscaler:
 service:
   type: ClusterIP
   port: 80
+

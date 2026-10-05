@@ -19,54 +19,7 @@ spec:
         - name: academy-container
           image: {{ .Values.deployment.image }}:{{ .Values.deployment.versionTag}}
           env:
-            - name: A5_RABBITMQ_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
-                  key: username
-                  optional: true
-            - name: A5_RABBITMQ_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
-                  key: password
-                  optional: true
-            - name: A5_RABBITMQ_N8N_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
-                  key: username
-                  optional: true
-            - name: A5_RABBITMQ_N8N_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
-                  key: password
-                  optional: true
-            - name: N8N_OWNER_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
-                  key: email
-                  optional: true
-            - name: N8N_OWNER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
-                  key: password
-                  optional: true
-            - name: N8N_OWNER_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
-                  key: apiToken
-                  optional: true
-            - name: N8N_USER_MANAGEMENT_JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_user_management_jwt_secret_name }}
-                  key: password
-                  optional: true
+{{- include "a5Chart.externalSecretEnv" . | nindent 12 }}
           envFrom:
             - configMapRef:
                 name: academy-cron-configmap
@@ -84,12 +37,14 @@ spec:
             requests:
               memory: {{ .Values.deployment.cron.memoryRequests }}
               cpu: {{ .Values.deployment.cron.cpuRequests }}
+      {{- if .Values.deployment.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+        - name: {{ .Values.deployment.imagePullSecrets }}
+      {{- end }}
       volumes:
         - name: infrastructure-config-dir-volume
-          configMap:
-            name: academy-infrastructure-config-dir
+          secret:
+            secretName: {{ include "a5Chart.infrastructureConfigSecretName" . }}
         {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
         - name: academy-files-volume
           persistentVolumeClaim:

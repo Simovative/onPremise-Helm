@@ -1,0 +1,120 @@
+# CHART_PATH/tests/cas-pod_test.yaml
+suite: casChart - CAS Pod
+templates:
+  - cas-pod.yaml
+  - cas-configmap.yaml # needed for checksum check
+tests:
+  - it: should only reference the configmap when no credential secret is configured
+    templates:
+      - cas-pod.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - lengthEqual:
+          path: spec.template.spec.containers[0].envFrom
+          count: 1
+      # no env block at all until something is referenced
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: should render a secretKeyRef for each configured credential
+    templates:
+      - cas-pod.yaml
+    set:
+      secret.redis_session_auth_secret_name: cas-redis
+      secret.redis_session_auth_secret_key: session
+      secret.redis_cache_auth_secret_name: cas-redis
+      secret.redis_cache_auth_secret_key: cache
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_SESSION_AUTH
+            valueFrom:
+              secretKeyRef:
+                name: cas-redis
+                key: session
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_CACHE_AUTH
+            valueFrom:
+              secretKeyRef:
+                name: cas-redis
+                key: cache
+
+  - it: should drop the plain value from the configmap once a secret is referenced
+    templates:
+      - cas-configmap.yaml
+    set:
+      envData.REDIS_CACHE.AUTH: plaintext-password
+      secret.redis_cache_auth_secret_name: cas-redis
+      secret.redis_cache_auth_secret_key: cache
+    asserts:
+      - notExists:
+          path: data.REDIS_CACHE_AUTH
+
+  - it: should fail when a credential secret name has no key
+    templates:
+      - cas-pod.yaml
+    set:
+      secret.ca_cert_value_secret_name: cas-ca
+      global.ca_cert_file: /tmp/university-ca.crt
+    asserts:
+      - failedTemplate:
+          errorMessage: 'ca_cert_value_secret_name is set to "cas-ca" but ca_cert_value_secret_key is empty'
+
+  # without CA_CERT_FILE the entrypoint skips the certificate, so the reference would do nothing
+  - it: should fail when the ca cert secret is referenced without global.ca_cert_file
+    templates:
+      - cas-pod.yaml
+    set:
+      secret.ca_cert_value_secret_name: cas-ca
+      secret.ca_cert_value_secret_key: ca
+    asserts:
+      - failedTemplate:
+          errorMessage: 'ca_cert_value_secret_name is set but global.ca_cert_file is empty - the container would ignore the certificate'
+
+  - it: should mount the default cas api shared secret
+    templates:
+      - cas-pod.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: secret-volume
+            secret:
+              secretName: cas-a5-api-shared-secret
+
+  - it: should mount an externally managed cas api shared secret
+    templates:
+      - cas-pod.yaml
+    set:
+      secret.cas_a5_api_secret_name: my-cas-a5-shared-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: secret-volume
+            secret:
+              secretName: my-cas-a5-shared-secret
+
+  - it: should use a custom image pull secret
+    templates:
+      - cas-pod.yaml
+    set:
+      deployment.imagePullSecrets: my-registry-credentials
+    asserts:
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: my-registry-credentials
+
+  - it: should omit imagePullSecrets when the name is empty
+    templates:
+      - cas-pod.yaml
+    set:
+      deployment.imagePullSecrets: ""
+    asserts:
+      - notExists:
+          path: spec.template.spec.imagePullSecrets

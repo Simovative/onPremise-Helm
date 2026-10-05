@@ -40,9 +40,15 @@ spec:
               mountPath: {{ .Values.deployment.envData.OAS_FILE_STORAGE_LOCATION }}
           {{- end }}
           env:
+            {{- $secret := .Values.secret }}
             {{- range $key, $value := .Values.deployment.envData }}
+            {{- if not (and (eq $key "OAS_S3_ENDPOINT_URL") $secret.s3_endpoint_url_secret_name) }}
             - name: {{ $key }}
               value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
+            {{- with (include "oasChart.externalSecretEnv" .) }}
+            {{- . | nindent 12 }}
             {{- end }}
             - name: OAS_ASSET_LOCATION
               value: "/app"

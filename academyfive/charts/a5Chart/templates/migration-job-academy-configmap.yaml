@@ -21,26 +21,30 @@ data:
   S3_ASSETS_URL: {{ .Values.envData.CAS_ASSETS_URL | default .Values.global.domain | quote }} # deprecated
   S3_ACADEMY_ASSETS_DOMAIN: {{ .Values.global.domain }}
   A5_FILE_STORAGE_TYPE: {{ quote .Values.infrastructureData.file_storage_type }}
-  {{- if not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "" ) }}
+  {{- if and (not (eq .Values.envData.A5_FILESTORAGE_ENDPOINT_URL "" )) (not .Values.infrastructureData.filestorage_endpoint_url_secret_name) }}
   AC5_FILESTORAGE_ENDPOINT_URL: {{ .Values.envData.A5_FILESTORAGE_ENDPOINT_URL }}
   {{- end }}
   {{- if not (eq .Values.envData.CAS_FILE_STORAGE_LOCATION "" ) }}
   CAS_FILE_STORAGE_LOCATION: {{ quote .Values.envData.CAS_FILE_STORAGE_LOCATION }}
   {{- end }}
   AC5_INFRASTRUCTURE_CONFIG: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
-  {{- if not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" ) }}
+  {{- if and (not (eq .Values.envData.REDIS_SESSION.AUTH "no_auth" )) (not .Values.infrastructureData.redis_session_auth_secret_name) }}
   REDIS_SESSION_AUTH: {{ quote .Values.envData.REDIS_SESSION.AUTH }}
   {{- end }}
   {{- if not (eq .Values.global.ca_cert_file "") }}
   CA_CERT_FILE: {{ .Values.global.ca_cert_file }}
+  {{- if not .Values.infrastructureData.ca_cert_value_secret_name }}
   CA_CERT_VALUE: {{ .Values.global.ca_cert_value }}
+  {{- end }}
   {{- end }}
   # backwards compatibility with pre 16.06.x
   AC5_AWS_INFRASTRUCTURE_CONFIG_ARN: {{ .Values.envData.A5_INFRASTRUCTURE_CONFIG }}
   {{- if not (eq .Values.envData.METRICS_SCRAPER_IP "")}}
   METRICS_SCRAPER_IP: {{ .Values.envData.METRICS_SCRAPER_IP }}
   {{- end }}
+  {{- if and (not (eq .Values.envData.TIDEWAYS_API_KEY "")) (not .Values.infrastructureData.tideways_api_key_secret_name) }}
   TIDEWAYS_API_KEY: {{ .Values.envData.TIDEWAYS_API_KEY }}
+  {{- end }}
   TIDEWAYS_CONNECTION: {{ .Values.envData.TIDEWAYS_CONNECTION }}
   A5_RABBITMQ_ENDPOINT_URL: {{ .Values.envData.A5_RABBITMQ_ENDPOINT_URL }}
   N8N_URL: {{ .Values.envData.N8N_URL }}

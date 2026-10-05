@@ -5,6 +5,13 @@
 global:
   domain: "a5.university.com"
   hosts: "*.university.com"
+  # Previous hostname, kept reachable during a domain change. Adds ingress rules and a second
+  # key in the infrastructure config. Not a second tenant - on-premise runs exactly one.
+  # olddomain: "old.university.com"
+  # Extra CA certificate the academyFIVE and CAS containers trust. ca_cert_file is the path it is
+  # written to and must end in .crt; ca_cert_value is the PEM file base64-encoded (base64 -w 0).
+  ca_cert_file: ""
+  ca_cert_value: ""
 a5Chart:
   enabled: true
   envData:
@@ -23,6 +30,40 @@ a5Chart:
   infrastructureData:
     database_read_location: "mysql://<YOUR_READ_USER>:<PASSWORD>@<READER_END_POINT>/<DATABASE_NAME>"
     database_write_location: "mysql://<YOUR_WRITE_USER>:<PASSWORD>@<WRITER_END_POINT>/<DATABASE_NAME>"
+    # Take the two values above out of this file without hand-writing the whole config: name a
+    # Secret and the key holding the value, and the chart keeps rendering everything else.
+    # Point them at a Secret you already have - one Secret can serve both keys. The key holds the
+    # complete DSN as above, not just the password. It is not URL-decoded: percent-encoding ends up
+    # in the password verbatim, and a password containing / ? or # breaks the DSN.
+    # database_read_location_secret_name: "a5-db-urls"
+    # database_read_location_secret_key: "read"
+    # database_write_location_secret_name: "a5-db-urls"
+    # database_write_location_secret_key: "write"
+    # Same for the Redis cache password (envData.REDIS_CACHE.AUTH) and the S3 endpoint URL
+    # (envData.A5_FILESTORAGE_ENDPOINT_URL). The cache key holds only the password, the filestorage
+    # key the complete URL including credentials. The filestorage pair covers that value completely -
+    # the config field and the AC5_FILESTORAGE_ENDPOINT_URL environment variable.
+    # cache_auth_secret_name: ""
+    # cache_auth_secret_key: ""
+    # filestorage_endpoint_url_secret_name: ""
+    # filestorage_endpoint_url_secret_key: ""
+    # The four pairs above are read from the cluster during helm install/upgrade. A pipeline that
+    # renders with helm template - Argo CD by default - never reaches the cluster and silently
+    # keeps the plain values. Use your pipeline's own substitution (SOPS, Argo CD Vault Plugin).
+    # A Secret that does not exist also falls back to the plain value, so remove it once the
+    # reference works. Changing the Secret needs a helm upgrade to take effect.
+    #
+    # Credentials that reach the application as environment variables. These are plain
+    # secretKeyRefs, so they work with any pipeline - no cluster access at render time.
+    # A missing Secret or key stops the Pod from starting; that is deliberate. Changing the Secret
+    # takes effect on the next Pod start (kubectl rollout restart).
+    # The CA key holds the same base64 value as global.ca_cert_value; global.ca_cert_file stays set.
+    # redis_session_auth_secret_name: ""
+    # redis_session_auth_secret_key: ""
+    # tideways_api_key_secret_name: ""
+    # tideways_api_key_secret_key: ""
+    # ca_cert_value_secret_name: ""
+    # ca_cert_value_secret_key: ""
   deployment:
     academyfiveReplicas: 1
     image: <YOUR_IMAGE_LOCATION>
@@ -73,6 +114,18 @@ a5Chart:
 
 casChart:
   enabled: true
+  # Credentials that reach CAS as environment variables. Name a Secret and the key holding the
+  # value; the chart picks the variable name and drops the plain value from the ConfigMap.
+  # A missing Secret or key stops the Pod from starting; that is deliberate.
+  # secret:
+  #   redis_session_auth_secret_name: ""
+  #   redis_session_auth_secret_key: ""
+  #   redis_cache_auth_secret_name: ""
+  #   redis_cache_auth_secret_key: ""
+  #   ca_cert_value_secret_name: ""
+  #   ca_cert_value_secret_key: ""
+  #   filestorage_endpoint_url_secret_name: ""
+  #   filestorage_endpoint_url_secret_key: ""
   envData:
     CAS_FILESTORAGE_ENDPOINT_URL: ""
     CAS_BUCKET_NAME: "casbucket"
@@ -134,6 +187,11 @@ gotenbergChart:
   enabled: false
 oasChart:
   enabled: false
+  # The S3 endpoint URL typically embeds credentials. Setting this drops the plain
+  # OAS_S3_ENDPOINT_URL from deployment.envData, so the two cannot disagree.
+  # secret:
+  #   s3_endpoint_url_secret_name: ""
+  #   s3_endpoint_url_secret_key: ""
 n8nSsoProxyChart:
   enabled: false
 secretChart:

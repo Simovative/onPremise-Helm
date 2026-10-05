@@ -28,54 +28,7 @@ spec:
           imagePullPolicy: Always
           command: [ 'bash', '-c', 'export AC5_TENANT={{ .Values.global.domain }}; sudo -E -u www-data php /srv/a5_source/httpdocs/bin/cli.php migrate' ]
           env:
-            - name: A5_RABBITMQ_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
-                  key: username
-                  optional: true
-            - name: A5_RABBITMQ_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_secret_name }}
-                  key: password
-                  optional: true
-            - name: A5_RABBITMQ_N8N_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
-                  key: username
-                  optional: true
-            - name: A5_RABBITMQ_N8N_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.rabbitmq_n8n_secret_name }}
-                  key: password
-                  optional: true
-            - name: N8N_OWNER_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
-                  key: email
-                  optional: true
-            - name: N8N_OWNER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
-                  key: password
-                  optional: true
-            - name: N8N_OWNER_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_owner_credentials_secret_name }}
-                  key: apiToken
-                  optional: true
-            - name: N8N_USER_MANAGEMENT_JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.infrastructureData.n8n_user_management_jwt_secret_name }}
-                  key: password
-                  optional: true
+{{- include "a5Chart.externalSecretEnv" . | nindent 12 }}
           envFrom:
             - configMapRef:
                 name: migration-academy-configmap
@@ -92,12 +45,14 @@ spec:
               cpu: {{ .Values.deployment.cpuLimits }}
             requests:
               cpu: {{ .Values.deployment.cpuRequests }}
+      {{- if .Values.deployment.imagePullSecrets }}
       imagePullSecrets:
-        - name: regcred
+        - name: {{ .Values.deployment.imagePullSecrets }}
+      {{- end }}
       volumes:
         - name: infrastructure-config-dir-volume
-          configMap:
-            name: migration-tenant-config
+          secret:
+            secretName: {{ include "a5Chart.migrationConfigSecretName" . }}
         # file_storage volume
         {{- if (eq "file" .Values.infrastructureData.file_storage_type) }}
         - name: academy-files-volume

@@ -1,0 +1,23 @@
+# CHART_PATH/tests/academy-configmap_test.yaml
+suite: a5Chart - Academy ConfigMap
+templates:
+  - academy-configmap.yaml
+  - migration-job-academy-configmap.yaml
+tests:
+  - it: should not carry an empty tideways api key
+    asserts:
+      - notExists:
+          path: data.TIDEWAYS_API_KEY
+
+  - it: should carry the tideways api key when it is set
+    set:
+      envData.TIDEWAYS_API_KEY: "some-api-key"
+    asserts:
+      - equal:
+          path: data.TIDEWAYS_API_KEY
+          value: "some-api-key"
+
+  - it: should omit the redis session auth while it is the no_auth sentinel
+    asserts:
+      - notExists:
+          path: data.REDIS_SESSION_AUTH

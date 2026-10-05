@@ -53,13 +53,42 @@ infrastructureData:
   aws_region: "eu-central-1"
   n8n_owner_credentials_secret_name: "n8n-owner-credentials"
   n8n_user_management_jwt_secret_name: "n8n-user-management-jwt-secret"
+  # must match casChart, and secretChart while it creates the Secret
+  cas_a5_api_secret_name: "cas-a5-api-shared-secret"
+  # Take single credential-bearing fields of the config from a Secret instead of the plain value
+  # above, and let the chart keep rendering the rest of the document. Read at install/upgrade
+  # time; the plain value stays the fallback, and a missing Secret with no plain value fails the
+  # render. Requires a real helm install/upgrade - helm template never reaches the cluster and
+  # silently shows the fallback.
+  # The last two override values that live in envData, not here - REDIS_CACHE.AUTH and
+  # A5_FILESTORAGE_ENDPOINT_URL. The filestorage pair covers both halves of that value: the
+  # config field and the AC5_FILESTORAGE_ENDPOINT_URL environment variable.
+  database_read_location_secret_name: ""
+  database_read_location_secret_key: ""
+  database_write_location_secret_name: ""
+  database_write_location_secret_key: ""
+  cache_auth_secret_name: ""
+  cache_auth_secret_key: ""
+  filestorage_endpoint_url_secret_name: ""
+  filestorage_endpoint_url_secret_key: ""
+  # Credentials that reach the application as environment variables. Named here, rendered as a
+  # secretKeyRef - the chart picks the variable name, you pick the Secret and the key, so an
+  # existing Secret works as it is. Setting one drops the plain value from the ConfigMap.
+  # A missing Secret or key stops the Pod from starting; that is deliberate.
+  redis_session_auth_secret_name: ""
+  redis_session_auth_secret_key: ""
+  tideways_api_key_secret_name: ""
+  tideways_api_key_secret_key: ""
+  ca_cert_value_secret_name: ""
+  ca_cert_value_secret_key: ""
 migration:
   executeMigration: true
 deployment:
   academyfiveReplicas: 1
   image: <YOUR_IMAGE_LOCATION>
-  versionTag: V18.11.23
+  versionTag: V18.14.7
   serviceAccountName: default
+  imagePullSecrets: "regcred"
   cpuLimits: 4096m
   cpuRequests: 2048m
   memoryLimits: 8G
@@ -116,3 +145,4 @@ autoscaler:
 service:
   type: ClusterIP
   port: 80
+
