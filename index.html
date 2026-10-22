@@ -71,7 +71,7 @@
       <div class="versionsBox" id="list" style="display:none;"></div>
     </div>
 
-    <div class="stamp">Seiten-Version: <strong>2026-01-13-auto-1</strong></div>
+    <div class="stamp">Seiten-Version: <strong>2026-10-22-semver-1</strong></div>
   </div>
 
 <script>
@@ -95,9 +95,26 @@
     return av.includes("stable");
   }
 
-  function dateMs(v) {
-    const t = Date.parse(v?.created || "");
-    return Number.isFinite(t) ? t : 0;
+  // Sortierung nach Chart-Version (z. B. 18.15.5 > 18.9.20), nicht nach "created":
+  // index.yaml wird bei jedem Deploy komplett neu erzeugt, dabei bekommen alle
+  // Einträge einen neuen Zeitstempel in alphabetischer Dateireihenfolge.
+  function compareVersions(a, b) {
+    const pa = String(a ?? "").split(/[.-]/);
+    const pb = String(b ?? "").split(/[.-]/);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const x = pa[i] ?? "", y = pb[i] ?? "";
+      const nx = /^\d+$/.test(x), ny = /^\d+$/.test(y);
+      if (nx && ny) {
+        if (+x !== +y) return +x - +y;
+      } else if (x !== y) {
+        // fehlender Teil oder Zahl vor Text: 18.6.0 > 18.6.0-rc1
+        if (x === "") return ny ? -1 : 1;
+        if (y === "") return nx ? 1 : -1;
+        if (nx !== ny) return nx ? 1 : -1;
+        return x.localeCompare(y, undefined, { numeric: true });
+      }
+    }
+    return 0;
   }
 
   function setLatest(elValue, elMeta, item, fallbackText) {
@@ -108,10 +125,7 @@
     }
     document.getElementById(elValue).innerHTML =
       `${escapeHtml(item.version)} ${item.stable ? '<span class="pill pill-strong">stable</span>' : ''}`;
-    const meta = [];
-    if (item.appVersion) meta.push(`App: ${item.appVersion}`);
-    if (item.created) meta.push(item.created);
-    document.getElementById(elMeta).textContent = meta.join(" • ");
+    document.getElementById(elMeta).textContent = item.appVersion ? `App: ${item.appVersion}` : "";
   }
 
   function renderFromYamlText(yamlText) {
@@ -133,18 +147,12 @@
     const chartName = entries[PREFERRED_CHART] ? PREFERRED_CHART : chartNames[0];
     const versions = entries[chartName] || [];
 
-    const sorted = [...versions].sort((a,b) => {
-      const db = dateMs(b), da = dateMs(a);
-      if (db !== da) return db - da;
-      return String(b.version).localeCompare(String(a.version), undefined, {numeric:true});
-    });
+    const sorted = [...versions].sort((a,b) => compareVersions(b.version, a.version));
 
     const allLines = sorted.map(v => ({
       version: v.version || "—",
       appVersion: v.appVersion || "",
-      created: v.created || "",
-      stable: isStable(v),
-      ms: dateMs(v)
+      stable: isStable(v)
     }));
 
     const latestAny = allLines[0] || null;
