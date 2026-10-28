@@ -6,18 +6,18 @@ metadata:
 data:
   allow-snippet-annotations: "true"
   annotations-risk-level: "Critical"
+  server-tokens: "false"
   http-snippet: |
-      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-      
-      log_format upstream_time '$remote_addr - $remote_user [$time_local] ' '"$request" $status $body_bytes_sent ' '"$http_referer" "$http_user_agent"' ' rt="$request_time"|"$upstream_connect_time"|"$upstream_header_time"|"$upstream_response_time"';
-      
-      
-      access_log  /var/log/nginx/access.log  main;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
 
-      sendfile        on;
+    log_format upstream_time '$remote_addr - $remote_user [$time_local] ' '"$request" $status $body_bytes_sent ' '"$http_referer" "$http_user_agent"' ' rt="$request_time"|"$upstream_connect_time"|"$upstream_header_time"|"$upstream_response_time"';
 
-      proxy_cache_path /tmp/nginx-cache  levels=1:2    keys_zone=nginxproxycache:10m    inactive=24h  max_size=1g;
-      proxy_store_access user:rw group:rw all:r;
-      proxy_hide_header Upgrade;
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+
+    proxy_cache_path /tmp/nginx-cache-asset  levels=1:2    keys_zone=nginxproxycache:10m    inactive=24h  max_size=1g;
+    proxy_store_access user:rw group:rw all:r;
